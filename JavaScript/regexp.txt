@@ -1,0 +1,51 @@
+关于应用正则的几个典型方法：
+一、String类型上的模式匹配
+（1）查找并替换String.prototype.replace() 
+str.replace(regexp|substr,newSubstr|function) 搜索匹配项，进行替换或者修改操作，返回新的值，不改变原来的字符串
+example:
+let str = "1,2,3";
+let newStr = str.replace(/\d/g,'a');
+newStr = "a,a,a";
+-------
+let newString = 'abc12345#$*%'.replace(/([^\d]*)(\d*)([^\w*])/,replacer);
+function replacer(match,p1,p2,p3,offset,string){
+	return [p1,p2,p3].join('-');
+	}
+'abc - 12345 - #$*%'
+-------
+'1,2,3'.replace('1','a');
+"a,2,3"
+(2)匹配捕获String.prototype.match()
+str.match(regexp)  返回匹配到的对象，如果是空，则返回空数组
+let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+str.match(/[A-E]/gi);
+["A", "B", "C", "D", "E", "a", "b", "c", "d", "e"]
+(3)返回索引String.prototype.search()
+str.search(regexp)  返回匹配到的第一个选项的索引，如果没找到，则返回-1
+"$#a123b".search(/\d/g);
+3
+（4）分隔字符串 String.prototype.split()
+str.split([separator[,limit]]) limit表示限定取匹配到的前limit个
+-------
+let names = 'Harry Trump ;Fred Barney; Helen Rigby ; Bill Abel ;Chris Hand ';
+name.split(/\s*;\s*/)
+["Harry Trump", "Fred Barney", "Helen Rigby", "Bill Abel", "Chris Hand "]
+-------
+var str = 'Hello World. How are you doing?';
+str.split(' ',3);
+["Hello", "World.", "How"]
+二、js中其他的正则匹配方法
+（1）匹配提取方法RegExp.prptotype.exec()
+regexpObj.exec(str) 返回一个数组,其中存放匹配的结果，如果未找到，则返回值为null，它是所有正则匹配方法中最复杂强大的一个。当没有分组的时候，match和exec是一样对待的。而exec无论是否有g都仅仅返回第一个匹配到的。
+let str ='cat2,hat8';
+(/c(at)\d/).exec(str);
+['cat2','at']
+!!!注意
+match函数在满足如下条件下将越俎代庖，实现和exec一样的功能：
+1）正则表达式中含有分组（括号）
+2）返回唯一的匹配
+（2）测试匹配与否 RegExp.prototype.test() 判断是否匹配，返回true or false
+regexpObj.test(str);
+let str = 'hello world!';
+let result = /^hello/.test(str);
+console.log(result); // true
