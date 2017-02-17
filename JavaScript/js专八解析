@@ -1,1 +1,10 @@
-22
+一共有44道题，不逐一分析了，选了几道，其中有自己做错的，有比较经典的，序号为题号，begin
+36.
+What is the result of this expression? (or multiple ones)        
+var a = {class: "Animal", name: 'Fido'};
+a.class
+这道题依赖浏览器，对于Chrome,Firefox,Opera,允许class这个保留字作为属性名称，但是在IE中却是不支持的
+34.
+What is the result of this expression? (or multiple ones)     
+var lowerCaseOnly =  /^[a-z]+$/;
+[lowerCaseOnly.test(null), lowerCaseOnly.test()]
