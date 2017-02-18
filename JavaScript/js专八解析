@@ -8,3 +8,40 @@ a.class
 What is the result of this expression? (or multiple ones)     
 var lowerCaseOnly =  /^[a-z]+$/;
 [lowerCaseOnly.test(null), lowerCaseOnly.test()]
+之所以都为true,是因为参数被自动转成了'null','undefined'
+4.
+What is the result of this expression? (or multiple ones)
+var val = 'smtg';
+console.log('Value is ' + (val === 'smtg') ? 'Something' : 'Nothing');
+输出结果为Something,因为+操作符的优先级比条件运算符高
+5.
+What is the result of this expression? (or multiple ones)        
+var name = 'World!';
+(function () {
+    if (typeof name === 'undefined') {
+        var name = 'Jack';
+        console.log('Goodbye ' + name);
+    } else {
+        console.log('Hello ' + name);
+    }
+})();
+输出为Goodbye Jack'
+7.
+What is the result of this expression? (or multiple ones)    
+var ary = [0,1,2];
+ary[10] = 10;
+ary.filter(function(x) { return x === undefined;});
+ary为稀疏数组，检测不到。
+22.
+What is the result of this expression? (or multiple ones)  
+Number.MIN_VALUE > 0
+答案为true,它是比零大的最小的值5e-324，而且-Number.MAX_VALUE是比零小的最大的数
+24.
+What is the result of this expression? (or multiple ones)
+2 == [[[2]]]
+在做比较的时候，两边都自动转为字符串的形式'2'
+28.
+What is the result of this expression? (or multiple ones)
+var a = {}, b = Object.prototype;
+[a.prototype === b, Object.getPrototypeOf(a) === b]
+Functions有原型属性，但是其他的object就没有了
