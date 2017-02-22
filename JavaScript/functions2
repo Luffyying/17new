@@ -1,0 +1,5 @@
+String.prototype.lastIndexOf();
+Array.prototype.lastIndexOf();
+String.prototype.indexOf();
+Array.prototype.indexOf();
+前面两个方法都是查询最后一个匹配元素出现的位置，后面的方法则返回首个匹配元素的索引，区分大小写
