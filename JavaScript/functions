@@ -1,0 +1,49 @@
+Array.prototype.slice.call(argument)
+该函数功能为将具有length属性的对象转为数组，除了IE下的节点集合（IE下的DOM对象是以COM对象的形式实现的，ji对象和com对象不能进行转换）
+slice有两种用法，String.slice  and  Array.slice 
+Array.prototype.slice.call(arguments) 相当于arguments.toArray().slice()
+Array.prototype.slice = function(start,end){
+      var result = new Array();
+      start = start || 0;
+      end = end || this.length; //this指向调用的对象，当用了call后，能够改变this的指向，也就是指向传进来的对象，这是关键
+      for(var i = start; i < end; i++){
+           result.push(this[i]);
+      }
+      return result;
+ }
+ call的作用就是改变当前函数的this指向
+ 有的时候还这样来转，[].slice.call(),同理
+ 
+ 
+ 在ES6中，我们直接可以这样操作：let arr = Array.from(arrayLike)
+ Array.from方法用于将两类对象转为真正的数组：类似数组的对象（具有length属性）和可遍历（iterable）的对象（包括新增的数据结构Set 、Map）,
+ 只要是部署了Iterator接口的数据结构，都可被转为数组。
+ Array.from('hello')
+// ['h', 'e', 'l', 'l', 'o']
+
+let namesSet = new Set(['a', 'b'])
+Array.from(namesSet) // ['a', 'b']
+
+Array.from([1, 2, 3])//真数组也不例外
+// [1, 2, 3]
+
+// NodeList对象
+let ps = document.querySelectorAll('p');
+Array.from(ps).forEach(function (p) {
+  console.log(p);
+});
+
+// arguments对象
+function foo() {
+  var args = Array.from(arguments);
+  // ...
+}
+
+扩展运算符（...）也可以将某些数据结构转为数组
+// arguments对象
+function foo() {
+  var args = [...arguments];
+}
+
+// NodeList对象
+[...document.querySelectorAll('div')]
