@@ -1,0 +1,11 @@
+/#模块化编程之 require.js的用法/
+这是一个库文件，主要解决js加载的依赖关系及按需加载带来的性能提升，是编码和维护变得容易些。
+require.js加载的模块，采用AMD规范，也就是说，模块必须按照AMD的规定来写。
+<script src="js/require.js" defer async="true" ></script>（异步加载，IE仅支持defer）
+<script src="js/require.js" data-main="js/main"></script> 入口文件main.js
+在main.js中，使用AMD规范定义的require()函数
+require(['a','b'],function(a1,b1){}) //require()异步的加载a,b,且，a1,b2作为模块的返回值，如果没有返回值，则直接需要执行即可。
+理论上，require.js加载的模块，必须是按照AMD规范，用define()函数定义的模块，但是有一些函数库符合AMD规范，如jQuery，又该怎样定义：
+先用require.config()方法，专门用来配置不兼容的模块，每个模块要定义（1）exports值（输出的变量名），表明这个模块外部调用时的名称；（2）deps数组，表明该模块的依赖性。
+（如果不使用require.config()方法,则默认那些依赖要与main.js，入口文件写在同一个目录下面）
+无论有多少个script元素有data-main属性，默认只有最后一个好用
