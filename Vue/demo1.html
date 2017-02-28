@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>起步</title>
+	<style>
+		.b{
+			background: pink;
+		}
+	</style>
+</head>
+<body>
+	<div id="app">
+		<span v-cloak>{{message}}</span>
+		<input type="text" v-model="message">
+		<h1 v-if="yes">vue come</h1>
+		<h1 v-if="no">vue come</h1>
+		<span v-text="message"></span>
+		<span v-html="message"></span>
+		<span v-show="no">lala</span>
+		<ul >
+			<li v-for="(item ,index) in items">{{item}}--{{index}}</li>
+		</ul>
+		<button v-on:click="doSomething">click</button>
+		<!-- v-bind and v-on abbreviate -->
+		<!-- <span :class="a"></span> -->
+		<span v-bind:class="a">option</span>
+		<span @click="doSomething">666</span>
+		<t></t>
+		<t v-for="item in items" v-bind:todo="item"></t>
+	</div>
+	<Child></Child>
+	<div id="app2">
+		<Child></Child>
+	</div>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script>
+		var Child = {
+			template:'<div>what to do</div>'
+		}
+		new Vue({
+			el:'#app2',
+			component:{
+				'my-com':Child//<my-com>将只在父模板中使用
+			}
+		});
+		Vue.component('t',{
+			props:['todo'],//add attribute
+			template:'<span>haha{{todo}}</span>'
+		});
+		var app = new Vue({
+			el:'#app',
+			data:{
+				message:'Hello Vue!',
+				yes:true,
+				no:false,
+				// items:[1,8,3,0,9],
+				items:
+				{
+					c:6,
+					k:0
+				},
+				a:'b'
+			},
+			methods:{
+				doSomething:function(){
+					alert('hello');
+				},
+				say:function(){
+
+				}
+			 }
+			// updated:{
+
+			// },
+			// destroyed:{
+			// 	//a series of gouzi
+			// }
+		});
+		//vue本身就是一个构造函数
+		// 扩展 Vue 得到一个可复用的构造函数
+		var myCom = Vue.extend({
+			template:'<h2>a custom component</h2>'
+		});
+		//define a component 全局组件,Vue.component隐式的调用vue.extend
+		
+		//使用v-if判断的时候注意是'===',双大括号会将数据解释为纯文本，而非html，可以用v-html来
+		
+	</script>
+</body>
+</html>
