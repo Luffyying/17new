@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		.active{
+			background: pink;
+		}
+		.hov{
+			font-size: 30px;
+			color: blue;
+		}
+	</style>
+</head>
+<body>
+	<div id="app">
+	<!-- 对象语法 -->
+		<div v-bind:class="{active:isActive,'hov':isHov}">7888888</div>
+		<!-- 数组语法 -->
+		<div v-bind:class="[actives,hovs]">7888888</div>
+		<!-- 绑定内联样式 -->
+		<span v-bind:style="{color:activeColor,fontSize:activeFontSize+'px'}">what to do</span>
+		<!-- 直接绑定到对象上更好 -->
+		<span v-bind:style="styleObject"></span>
+		<!-- 样式的数组语法 -->
+		<!-- <div v-bind:style="[baseStyles,styleObject]"> -->
+		<span v-if="ok">show</span>
+		<h1 v-else>hidden</h1>
+		<!-- 切换多个元素 -->
+		<template v-if="ok">
+			<h1>title</h1>
+			<h2>paragraph</h2>
+			<h3>sdfds</h3>
+		</template>
+		<!-- 组件中的v-for -->
+		<com name="hihi" v-for="item in items"></com>
+		<!-- 事件处理器 -->
+		<!-- 监听事件 -->
+		<button v-on:click="counter +=1">add</button>
+		<button v-on:click="greet">click</button>
+		<button v-on:click="say('what')">click</button>
+		<p>这个按钮被点击了{{counter}}多少次</p>
+	</div>
+	
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script>
+		Vue.component('com',{
+			template:'<div>{{name}}</div>',
+			props:['name']
+		});
+		// 增强版的v-bind用于绑定class and style,表达式的结果类型除了字符串之外，还可以是对象或数组。
+		new Vue({
+			el:'#app',
+			data:{
+				counter:0,
+				isActive:true,
+				isHov:true,
+				actives:'active',
+				hovs:'hov',
+				activeColor:'red',
+				activeFontSize:30,
+				items:[1,2,3,4,5],
+				ok:true,
+				styleObject:{
+					color: 'red',
+    				fontSize: '13px'
+
+				},
+				baseStyles:{
+					background: 'pink',
+
+				}
+				
+
+
+			},
+			methods:{
+					greet:function(){
+						alert('hhaha');
+					},
+					say:function(msg){
+						alert(msg);
+					}
+				}
+		});
+	</script>
+</body>
+</html>

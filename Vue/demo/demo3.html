@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<!-- 表单控件绑定 -->
+	<div id="app">
+		<input type="text" v-model="message" placeholder="edit">
+		<p>{{message}}</p>
+		<!-- 多行文本 -->
+		<textarea v-model="message" placeholder="add multiple lines"></textarea>
+		<input type="checkbox" id="checkbox" v-model="checked">
+		<label for="checkbox">{{checked}}</label>
+		<!-- 多个勾选框 -->
+		<input type="checkbox" id="jack" value="jack" v-model="checkedNames">
+		<label for="jack">jack</label>
+		<input type="checkbox" id="john" value="john" v-model="checkedNames">
+		<label for="john">jack</label>
+		<input type="checkbox" id="mike" value="mike" v-model="checkedNames">
+		<label for="mike">mike</label>
+		<span>{{checkedNames}}</span>
+		<!-- 单选按钮 -->
+		<input type="radio" id="one" value="one" v-model="picked">
+		<label for="one">one</label>
+		<input type="radio" id="two" value="two" v-model="picked">
+		<label for="two">two</label>
+		<span>{{picked}}</span>
+		<button v-on:click="show = !show">toggle</button>
+		<transition name="fade">
+			<p v-if="show">hello vue</p>
+		</transition>
+	</div>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script>
+		new Vue({
+			el:'#app',
+			data:{
+				show:true,
+				message:"hello",
+				checked:'',
+				checkedNames:[],
+				picked:[]
+			}
+		});
+	</script>
+</body>
+</html>

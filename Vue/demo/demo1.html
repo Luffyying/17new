@@ -6,15 +6,53 @@
 </head>
 <body>
 	<div id="app">
+	<!-- 文本插值 -->
 		{{message}}
+		<button v-bind:disabled="someDynamic">button</button>
+		<span v-once>{{message}}</span><!-- 一次性的插值 -->
+		<span v-bind:id="'dy' + 'ma'">hello</span><!-- 使用v-bind应用html属性 -->
+		<!-- 对于所有的数据绑定都可以使用javascript表达式 -->
+		<span>{{message.length >0?66:99}}</span><!-- 有个限制就是每个绑定只能包含单个表达式 -->
+		<form v-on:submit.prevent="onSubmit"></form><!-- 修饰符 触发的事件调用event.preventDefault -->
+		<span v-bind:id="raw | formatId">888</span>
+		<!-- 计算属性:相比于methods,它会利用缓存，只有监测到变化，才会重新计算 -->
+		<span>{{reMessage}}</span>
+		<!-- 还有一个类似的$watch -->
+		<div>{{reMes}}</div>
+
 	</div>
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
 	<script>
 		var app = new Vue({
 			el:'#app',
 			data:{
-				message:'Hello Vue!'
+				message:'Hello Vue!',
+				someDynamic:false,
+				dy:'name',
+				ma:'lala',
+				raw:7,
+				reMes:''
+			},
+			filters:{//自定义过滤器
+				formatId:function(value){
+					if(value>6){
+						return 0;
+					}
+					return value;
+				}
+			},
+			computed:{
+				reMessage:function(){
+					return this.message.split('').reverse().join('');
+				}
+			},
+			watch:{
+				//只有当依赖属性发生变化的时候，才会计算，而且事先要先定义好
+				message:function(){
+					return this.message.split('').reverse().join('');
+				}
 			}
+			
 		});
 	</script>
 </body>
