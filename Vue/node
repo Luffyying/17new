@@ -1,0 +1,44 @@
+ Start learning Vue
+这里有一个很好的帮助了解Vue内部结构和原理的文章推荐：
+[vue的构造](http://jiongks.name/blog/vue-code-review/)
+
+
+源码研读还是慢慢来吧，总结下今天学习的心得：
+
+<span v-bind:class="a">option</span>
+ 对于如上的代码，你的原意是添加一个类a，但是v-bind也不是小卒之辈，如果真将a定义为一个类，直接用就好了，事实上是这样的：
+<style>
+	.b{
+	background: pink;
+	}
+</style>
+var app = new Vue({
+	el:'#app',
+	a:'b'
+});
+v-bind绑定的属性是变量。
+var app = new Vue({});
+Vue.component('t',{
+	props:['todo'],//add attribute
+	template:'<span>haha{{todo}}</span>'
+});`
+定义了一个全局组件，可<t></t>怎么样都不显示，原因就是应该先定义，再使用。 
+在vue2.0中，循环结构中移除了$index,可以使用如下来代替： 
+<li v-for="(item ,index) in items">{{item}}--{{index}}</li>
+其中item就是值，index对于数组即是索引，对于对象来说即是key。
+关于Vue组件：
+全局注册：
+Vue.component('my-component', {
+  // 选项
+})
+实则本质上不需要全局注册，就是局部注册
+ var Child = {
+  template: '<div>A custom component!</div>'
+}
+new Vue({
+  // ...
+  components: {
+    // <my-component> 将只在父模板可用
+    'my-component': Child
+  }
+})

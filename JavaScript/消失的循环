@@ -1,0 +1,64 @@
+/#读前端早读课有感，摘取部分信息，仅用于记录分享/
+写javascript的时候，我们似乎到处都在使用循环，从最初结识C语言开始的while,for循环，到后来js大军的(for of),还有很多自带的方法，那就好好总结下。
+/*
+let i=0;
+const len = input.length;
+let output = [];
+while(i <len){
+		output.push(ood(input[i]));
+		i = i+1;
+}*/这里大概是我们最初写的代码，它看起来很像过程式编程，后来出现了for():
+/*
+let output = [];
+	for(let i=0;i<input.length;i++){
+		output.push(ood(input[i]));
+	}
+*/这个已经有所改进，再后来的ES6中，不再需要计数器了：
+  let ar = ['sdf7','sd','sdf9'];
+	let br = ['sdkk','sdf9','oo90'];
+	let arra = [];
+	let arrb = [];
+	for(let item of ar){
+		arra.push(ood(item));
+	}
+  
+  后期，我们还想将代码更加简洁，前提当然是基于最原始的循环了，当你使用map(),reduce(),filter(),find()的时候是否想过它们的内部实现.
+  我们有两个数组，想通过不同的函数映射到新数组中，于是：
+  function changeOod(array){
+		let output = [];
+		for(let item of array){
+			output.push(ood(item));
+		}
+		return output;
+	}
+  function changeIzz(array){
+		let output = [];
+		for(let item of array){
+			output.push(izz(item));
+		}
+		return output;
+	}
+  但是，它们的结构是一样的，于是出现了一个专有名词：模式映射，对于给定的数组和函数，将数组中的每个元素映射到新的数组中，且把函数作用在数组上
+  function map(f,a){
+		let output = [];
+		for(let item of a){
+			output.push(f(item));
+		}
+		return output;
+	};
+	//如果要摆脱循环，使用递归
+	function map(f,a){
+		if(a.length ===0){
+			return [];
+		}else{
+			return [(f(a[0]))].concat(map(f,a.slice(1)));
+		}
+	}
+  类似的还要：
+  function reduce(f,initialVal,a){
+		let working = initialVal;
+		for(let item of a){
+			working = f(working,item);
+		}
+	};
+  这就是我们用内嵌数组来解决的问题，剔除循环控制结构，增强了代码可读性，以后是不是可以不用for()循环了呢。

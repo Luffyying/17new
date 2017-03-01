@@ -1,0 +1,28 @@
+1.熟悉NaN吗
+typeof NaN//number
+任何与NaN比较运算的结果都为FALSE,只能通过isNaN()来比较：
+var a = NaN;
+var b = NaN;
+console.log(isNaN(a) && isNaN(b));//true
+2.处理NaN
+在一般的数组去重的时候，也许会用到indexOf,但是虽然它是严格情况下，‘===’，但是还是不能判NaN
+ES6新增方法includes()便可以。
+3.一般会使用对象key来去重，但是它的弊端是：无法区分隐式类型转换成字符串后一样的值，比如1和'1'
+4.Map是一种新的数据类型，可以把它想象成key类型没有限制的对象。此外，它的存取使用单独的get()、set()接口。
+function unique(arr){
+  var ret = [];
+  var len = arr.length;
+  var tmp = new Map();
+  for(var i=0;i<len;i++){
+     if(!tmp.get(arr[i])){
+        tmp.set(arr[i],1);
+        ret.push(arr[i]);
+        }
+   }
+   return ret;
+}
+5.还有一个更加好用的Set()
+function unique(arr){
+ var set = new Set(arr);
+ return Array.from(set);
+ }
