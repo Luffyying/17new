@@ -5,7 +5,7 @@
 
 源码研读还是慢慢来吧，总结下今天学习的心得：
 
-<span v-bind:class="a">option</span>
+1.<span v-bind:class="a">option</span>
  对于如上的代码，你的原意是添加一个类a，但是v-bind也不是小卒之辈，如果真将a定义为一个类，直接用就好了，事实上是这样的：
 <style>
 	.b{
@@ -17,16 +17,21 @@ var app = new Vue({
 	a:'b'
 });
 v-bind绑定的属性是变量。
-var app = new Vue({});
+
+2.var app = new Vue({});
 Vue.component('t',{
 	props:['todo'],//add attribute
 	template:'<span>haha{{todo}}</span>'
 });`
-定义了一个全局组件，可<t></t>怎么样都不显示，原因就是应该先定义，再使用。 
-在vue2.0中，循环结构中移除了$index,可以使用如下来代替： 
+定义了一个全局组件，可<t></t>怎么样都不显示，原因就是应该先定义，再使用。
+
+
+3.在vue2.0中，循环结构中移除了$index,可以使用如下来代替： 
 <li v-for="(item ,index) in items">{{item}}--{{index}}</li>
 其中item就是值，index对于数组即是索引，对于对象来说即是key。
-关于Vue组件：
+
+
+4.关于Vue组件：
 全局注册：
 Vue.component('my-component', {
   // 选项
@@ -42,3 +47,14 @@ new Vue({
     'my-component': Child
   }
 })
+使用Vue.component('todo',{}) 来创建组件的时候，template中的模板要被包在一个标签中，这一点和react是极为相似的。
+
+5.由于VUE不允许动态添加根级响应式属性，所谓的根级响应式属性，便是data下面第一层的数据,data.k，
+所以创建一个实例的时候，一定要写上数据，即便里面是空的，如果在实例创建之后添加到实例上的属性，是不会触发视图的更新的，被代理的属性也不是响应的,
+为了完善这个问题，可以使用set()来添加，不能添加到根级，但是它可以添加到data下面的对象上，例如：
+var nm = new Vue({data:{
+	obj:{},
+	obj2:78
+}});
+Vue.set(nm.obj,'k',90);
+this.$set(nm.obj,'k',90);都可以
