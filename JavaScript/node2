@@ -1,0 +1,11 @@
+这里有一个清理缓存的小妙招：
+function test(){
+		var ran = Math.random()*100;
+		$('#app').load('load.html?r=' + ran,function(){
+			console.log('防止缓存');
+		});
+    //or 
+    $('#app').load('load.html?t=' +new Date().getTime() ,function(){
+			console.log('防止缓存');
+		});
+ }
