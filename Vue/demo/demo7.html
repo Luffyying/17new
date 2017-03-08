@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+		
+	</style>
+</head>
+<body>
+	<div id="app">
+		<ul>
+			<li v-for="user in users.users">{{user.name}} </li>
+		</ul>
+	</div>
+	<script src="vue.js"></script>
+	<script>
+		var data = {name:'sdfd'}
+		Vue.component('todo',{
+			template:'<span><input v-model="name">{{name}}</span>',
+			data:function(){
+				return data;			
+			}
+		});
+		var vm = new Vue({
+			el:'#app',
+			// data:{
+			// 	users:{},
+			// 	show:true,
+			// 	s:true
+			// },
+			data:function(){
+				return {
+					users:{},
+					show:true,
+					s:true
+				}
+			},
+			created:function(){
+				this.getData();
+			},
+			methods:{
+				getData:function(){
+					console.log('sss');
+					var users = [
+						{
+							id:1,
+							name:'tom'
+						},
+						{
+							id:2,
+							name:'luffy'
+						},
+						{
+							id:3,
+							name:'sam'
+						}
+					];
+					//Vue.set(this.users,'users',users);
+					this.$set(this.users,'users',users);
+				}
+			}
+		});
+	</script>
+</body>
+</html>

@@ -5,6 +5,8 @@
 	<title>Document</title>
 </head>
 <body>
+<!-- 每一个Vue应用都是通过构造函数Vue创建一个Vue的跟实例启动的， -->
+<!-- 着重理解响应式机制和组件生命周期 -->
 	<!-- 表单控件绑定 -->
 	<div id="app">
 		<input type="text" v-model="message" placeholder="edit">
@@ -31,19 +33,45 @@
 		<transition name="fade">
 			<p v-if="show">hello vue</p>
 		</transition>
+		<div v-html="isHtml"></div>
+		<div>{{isHtml}}</div><!-- 双大括号只能将数据解释为纯文本，而非HTML -->
+		<div>{{ok ?'yes':'no'}}</div>
 	</div>
-	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="vue.js"></script>
 	<script>
-		new Vue({
+		var vm = new Vue({
 			el:'#app',
 			data:{
 				show:true,
 				message:"hello",
 				checked:'',
 				checkedNames:[],
-				picked:[]
+				picked:[],
+				isHtml:'<h1>lalala</h1>',
+				ok:true
 			}
 		});
+		var nm = new Vue({data:{
+			obj:{},
+			obj2:78
+		}});
+		//由于VUE不允许动态添加根级响应式属性，但是它可以添加到data下面的对象上，所谓的根级响应式属性，便是data下面第一层的数据,data.k
+		//但是可以这样，Vue.set(vm.obj,'k',90),其中vm.obj为data下的对象
+	
+		// 如果在实例创建之后添加到实例上的属性，是不会触发视图的更新的，被代理的属性也不是响应的,但是可以使用set(),,Vue.set(vm.b,'b','89');
+		//除了data属性，Vue还有一些其他的实例属性和方法
+		// var data = {a:1};
+		// var vm = new Vue({
+		// 	el:"#app",
+		// 	data:data
+		// });
+		// vm.$data ===data;
+		// function a(c){
+		// 	return c.first + c.second; 
+		// }
+		// const a = ({first,second})=> first + second;
+		//如果代码块的部分多余一条语句，则{ a +b}
+		//使用babel编译ES6，npm install babel -g; babel a.js -o b.js
 	</script>
 </body>
 </html>

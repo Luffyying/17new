@@ -1,0 +1,19 @@
+sublime实用快捷键：
+ctrl+l:选中一行，多次按，依次选中行
+ctrl+x:删除一行
+ctrl+h:替换
+ctrl+/:对所选区域添加注释或者取消注释
+ctrl+d:先选中内容，搜索其他一样的内容
+ctrl+f:查找
+ctrl+shift+d:将光标放置一行末尾，用于复制
+
+使用npm的一些安装命令：
+npm install vue-router --save 其中--save作用是自动把模块和版本号添加到dependencies部分
+省掉你手动修改package.json文件的步骤
+vue init webpack-simple 项目名字：
+vue init webpack 项目名字（不能用中文）
+二者区别在于：webpack-simple没有包括eslint，build等功能
+如果使用默认的vue-cli框架，它本身嵌套的层次很深，路由配置也不是简单的你所想的那样，所有
+自己手动添加一些文件，比如说样式，可能会报404。
+
+从线上库拉代码到本地，还需要自己手动来装依赖，npm install,它本身是没有的。

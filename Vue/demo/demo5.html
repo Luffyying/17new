@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div id="app">
+		<!-- Vue推荐使用template来创建HTML,但有的时候 需要使用render-->
+		<!-- <anchored></anchored> -->
+		<!-- 什么是render,内部的实现是怎样的 -->
+		<ul v-if="items.length">
+			<li v-for="item in items">{{item.name}}}</li>
+		</ul>
+		<!-- 被render重写 -->
+		<!-- render: function (createElement) {
+		  if (this.items.length) {
+		    return createElement('ul', this.items.map(function (item) {
+		      return createElement('li', item.name)
+		    }))
+		  } else {
+		    return createElement('p', 'No items found.')
+		  }
+		} -->
+	</div>
+	<script src="vue.js"></script>
+	<script type="text" id="an">
+		<span>world</span>
+	</script>
+	<script>
+	// Vue.component('anchored',{
+	// 		template:'<h1>hello</h1>'
+	// 	}
+	// );
+	// Vue.component('anchored',{
+	// 	template:'#an'
+	// });
+	
+
+
+		var vm = new Vue({
+			el:'#app',
+			data:{
+				show:true,
+				s:true,
+				items:[]
+			}
+		});
+	</script>
+</body>
+</html>

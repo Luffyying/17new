@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>数据绑定</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+</head>
+<body>
+	<div id="app">
+	<!-- 单项数据绑定 -->
+		{{message}}
+	<!-- 双向数据绑定 -->
+		<p>{{msg}}</p>
+		<input type="text" v-model="msg">
+	</div>
+	<script src="vue.js"></script>
+	<script>
+		var vue = new Vue({
+			el:'#app',
+			data:{
+				message:'here is a test',
+				msg:'haha'
+			}
+		});
+	</script>
+</body>
+</html>

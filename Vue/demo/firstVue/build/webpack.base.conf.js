@@ -36,7 +36,15 @@ module.exports = {
       //     formatter: require('eslint-friendly-formatter')
       //   }
       // },
-     
+      {
+        test: /\.scss$/,
+        use:[
+        {
+          loader:"style-loader"
+        },
+        {loader:"css-loader"},
+        {loader:"sass-loader"}]
+      },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
@@ -63,6 +71,18 @@ module.exports = {
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }
+    ]
+  },
+   vue: {
+    loaders: utils.cssLoaders({ sourceMap: useCssSourceMap }),
+    postcss: [
+      require('autoprefixer')({
+        browsers: ['last 2 versions']
+      }),
+      require('postcss-import'),
+      require('postcss-sass-extend'),
+      require('postcss-simple-vars'),
+      require('postcss-nested')
     ]
   }
 }
