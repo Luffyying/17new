@@ -1,0 +1,164 @@
+1.序列化数据 ->快速获取表单数据
+下面有四中方法：
+  serialize()//序列化为字符串
+	serializeArray()//序列化为数组
+	JSON.parse()//json字符串转化为json对象
+	JSON.stringify()//json对象转化为json字符串
+  下面具体举一个具体的栗子：
+  <form id="form">
+		用户名：<input type="text" name="name">
+		密码：<input type="password" name="password">
+		性别：<input type="radio" name="sex" value="1">男<input type="radio" name="sex" value="0">女<br/>
+		简介: <textarea name="intro" cols="30" rows="10"></textarea> 
+	</form>
+	<button id="submit">submit</button>
+	<script>
+	$('#submit').click(function(){
+		var data = $('#form').serialize();
+		console.log(data);
+		//name=23&password=222&sex=1&intro=2222222
+		var data2 = $('#form').serializeArray();
+		console.log(data2);
+		//[Object, Object, Object, Object],其中每个对象下的内容为：name:"name"value:"jack"
+    $.ajax({
+			url:'t.php',
+			data:data
+		});//然后将取到的数据发送出去
+    });
+  </script>
+  
+注意**：上面两个方法的便利之处就在于省得用jquery一一来取，但是标签的属性都要加上name才可以，无name就取不到，disabled不可以， readonly可以
+（不能编辑但是可以提交的表单）
+
+2.想要返回异步数据，如：
+function getData(url){
+		var result = null;
+		$.ajax({
+			url:url,
+			data:{name:'tom'},
+			success:function(data){
+				result = data;
+			}
+		});
+		return result;
+	}
+  但是你会发现，result的结果为null,因为ajax是异步的，请求还没执行完毕，其实ajax和return result是同时执行的，而异步又是耗时的，这时候又有这个需求，
+  所以设置为同步：async:false
+  
+  3.同步ajax引起的UI线程阻塞
+  接着按照上面的栗子2来：我们想要实现一个功能：在数据没加载成功之前，显示loading的等待gif图片，于是乎：
+  function getData(url){
+		var result = null;
+		$.ajax({
+			url:url,
+			data:{name:'tom'},
+			async:false,
+			beforeSend:function(){
+				$('.loadingIcon').show();
+			},
+			success:function(data){
+				result = data;
+			},
+			complete:function(){
+				$('.loadingIcon').hide();
+			}
+		});
+		return result;
+	}
+  或者是这样：
+  $('.btn1').click(function(){
+        $('.loadingicon').show();
+        var data = getData1();
+        $('.loadingicon').hide();
+        alert(data);
+});
+  但是这根本就没用，仅仅连图片都没有，这是为什么呢，在一个浏览器中，可以理解有两个引擎，对于chrome，一个是解析JS的v8引擎，一个是UI引擎，GIF图片是要
+  由UI引擎来渲染的，　浏览器的渲染(UI)线程和js线程是互斥的，在执行js耗时操作时，页面渲染会被阻塞掉，异步发ajax的时候则是可以的，因为可以看似是两个发了
+  两个线程，那如果用开启另一个线程的方法呢：
+  $('.btn2').click(function(){
+        $('.loadingicon').show();
+        setTimeout(function(){
+            $.ajax({
+                url : 'p.php',
+                async : false,
+                success: function(data){
+                    $('.loadingicon').hide();
+                    alert(data);
+                }
+            });
+        }, 0);
+});
+事实上也是不行的
+  可以用promise,它也是一个规范。
+  function getData(url){
+		var defer = $.Derferred();
+		$.ajax({
+			url:url,
+			data:{name:'tom'},
+			beforeSend:function(){
+				$('.loadingIcon').show();
+			},
+			success:function(data){
+				defer.resolve(data);
+			}
+		});
+		return defer.promise();
+	}
+  然后事件上会有所不同。
+  $.when(getData('t3.php')).done(function(data){
+			console.log(data);
+			$('.loadingIcon').hide();
+		})
+ 其实这是一个很单纯的目的，就是为了得到数据，但是如果用在方法中，直接调用回调函数：
+ function getData(callback){
+ $.ajax({
+  //.....
+    success:function(data){
+      callback(data);
+    }
+    
+ });}
+4.为ajax设置超时时间
+$.ajaxSetup({
+		timeout:1500
+	});
+	$.ajax({
+		url:'t3.php',
+		timeout:1000,
+		success:function(data){
+			console.log(data);
+		},
+		error:function(xhr,textStatus){
+			console.log('error');
+			console.log(textStatus);//1秒之后会显示timeout}
+	});
+  ajax中的会覆盖全局设置的超时时间，超时时间：XMLHttpRequest.timeout 是一个无符号长整型数，代表着一个请求在被自动终止前所消耗的毫秒数。
+  默认值为 0，意味着没有超时。超时并不应该用在一个 document environment 中的同步 XMLHttpRequests 
+  请求中，否则将会抛出一个 InvalidAccessError 类型的错误。当超时发生， timeout 事件将会被触发。
+  
+  5.判断error的类型 就是textStatus
+  timeout 超时
+  error 获取不到具体的错误
+  notmodified 返回304
+  parseerror 解析xml,json错误
+  abort 请求取消 （xml.abort()）
+  这些错误可以解决一些问题，如：
+  error:function(xhr,textStatus){
+    if(textStatus !='error'){
+      alert('请重试');//刷新的时候textStatus是error
+    }
+  }
+  
+  6.关于ajax的一些方法：
+  $.get(url,data,callback,type);
+	//type:json script等
+	$.post(url,data,callback,type);
+	$.getScript('test.js',function(){
+		a();
+		//其中a()是test.js中的一个函数，这是一个很有用的方法，在轻量级场景中加载页面资源，而不用require等});
+	$.getJSON(url,data,callback);//直接将数据转换为json格式
+	$('#loadDiv').load('load.html',function(){
+		console.log('load success');
+    //内部实则调用的是innerHTML
+	});
+	
