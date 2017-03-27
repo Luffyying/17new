@@ -1,0 +1,54 @@
+代码都是一行一行按着顺序执行的，我们说是同步，但是，当遇到这样的情况的时候：
+//普通函数
+		function add(a,b){
+			return a + b;
+		}
+		const result = add(1,2);我们可以很快就得到结果，but，，when like this:
+我们发送了一个远程调用（异步）： const res = getAdd('http://www.example.com?num1=1&num2=2');这个过程要等待，并非立即执行的，为了不影响下面的代码的执行，
+function addAsync(num1,num2,callback){
+			return $.getJSON('http://www.example.com',{num1:num1,num2:num2},callback);
+		}
+		// addAsync(1,2,function success(){});
+		addAsync(1,2,success =>{
+			const res = success;
+		});
+其中的return $.getJSON('http://www.example.com',{num1:num1,num2:num2},callback);
+或者更加直观一些：
+  console.log(1);
+	console.log(2);
+	console.log(3);
+	setTimeout(function(){
+		console.log(4);
+	},1000);
+	console.log(5);
+  
+  输出结果为：
+  1.2.3.5.4
+  其中的setTimeout（）就是一个异步的操作，继续接着上一个栗子来说：
+//如果是1+2+3呢
+		addAsync(1,2,success =>{
+			reeA = success;//3 here
+			addAsync(success,3,success =>{
+				resB = success;// 6 here
+				//...依次类推，显得臃肿
+			})
+		});
+ 于是有个promise,
+ //相同栗子下的promise形式
+		let resA,resB,resC;
+		function addAsync(num1,num2){
+			return fetch(`http://www.example.com?num1=${num1}&num2=$(num2)`.then(x =>x.json()))
+		}
+		addAsync(1,2).then(success =>{resA = success;return resA})
+		.then(success =>{addAsync(success,3)})
+		.then(success =>{
+			resB = success;return resB
+		})
+		.then(success => addAsync(success,4))
+		.then(success =>{
+			resC = success;
+			return resC
+		})
+		.then(success =>{
+			console.log('over');
+		})
