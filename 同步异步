@@ -52,3 +52,27 @@ function addAsync(num1,num2,callback){
 		.then(success =>{
 			console.log('over');
 		})
+		
+		
+		下面是一个具体的栗子：
+		let a = new Promise((resolve,reject) =>{
+		      if(/* 异步操作成功 */){
+		      	resolve(value)
+		      }else{
+		      	reject(error);
+		      }
+			setTimeout(function(){resolve('success')},500);
+		});
+		var test = function(){
+			a.then(message =>{
+			//success
+				console.log(message)
+			},function(value){
+				//failure
+			}
+			.catch(error =>{
+			//捕捉错误
+			console.log('fail');
+			})
+		};
+		test();//success
