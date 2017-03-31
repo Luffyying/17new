@@ -3,8 +3,27 @@
 <head>
 	<meta charset="UTF-8">
 	<title>起步</title>
+	<style>
+		.s th{
+			height: 100px;
+			/*line-height: 100px;*/
+		}
+	</style>
 </head>
 <body>
+	<table>
+		<thead class="s">
+			<th>ksd</th>
+			<th>k</th>
+		</thead>
+		<tbody>
+			<tr>
+				<td>k</td>
+				<td>k</td>
+				<td>k</td>
+			</tr>
+		</tbody>
+	</table>
 	<div id="app">
 	<!-- 文本插值 -->
 		{{message}}
@@ -23,6 +42,15 @@
 	</div>
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
 	<script>
+		// 只存一个item就可以了
+		self.knowledge_list.splice();//
+		var newDate = self.data.replace.save_data;
+		var comment = newDate.data[index]['comment'];
+		newDate.data[i] = postData;
+		newDate.data[i]['comment'] =comment;
+		newDate.data[i]['type_text'] = self.data.replace.type_text;
+		//每次只能选择一个，
+		
 		var app = new Vue({
 			el:'#app',
 			data:{

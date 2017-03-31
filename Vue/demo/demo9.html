@@ -4,54 +4,83 @@
 	<meta charset="UTF-8">
 	<title>生命周期</title>
 	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+	<script src="vue.js"></script>
+	<script src="jquery.js"></script>
 </head>
 <body>
 	<div id="app">
-	
+		<button class="btn">click</button>
+		<button class="btn" id="b">click</button>
 	</div>
-	<script src="vue.js"></script>
-	<script>
-		var vue = new Vue({
-			el:'#app',
-			data:{
-				message:'here is a test',
-				msg:'haha'
-			},
-			beforeCreate:function(){
-				//在实例初始化之后，数据观测(data observer) 和 event/watcher 事件配置之前被调用
-				console.log('beforeCreate');
-			},
-			created:function(){
-				//在实例创建之后同步调用，此时实例已经结束解析选项，已建立：数据绑定，计算属性，方法，但是OM没开始编译，$el还不存在，但是实例存在
-				console.log('建立');
-				console.log(this.msg);
-			},
-			beforeMount:function(){
-				//相关的render函数首次被调用
-				console.log('beforeMount');
-			},
-			mounted:function(){
-				//el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子
-				console.log('mounted');
-			},
-			beforeUpdate:function(){
-				//数据更新的时候调用
-				console.log('beforeUpdate');
-			},
-			updated:function(){
-				//已经更新
-				console.log('Updated');
-			},
-			beforeDestroy:function(){
-				//实例销毁之前调用
-				console.log('我马上要消失了');
-			},
-			destroyed:function(){
-				console.log('已消失');
-				//Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。
-			}
 
-		});
+	
+	<script>
+		function Foo(){
+			getName = function(){
+				console.log(1);
+			}
+			return this;
+		}
+		Foo.getName = function(){
+			console.log(2);
+		}
+		Foo.prototype.getName = function(){
+			console.log(3);
+		}
+		var getName = function(){
+			console.log(4);
+		}
+		function getName(){
+			console.log(5);
+		}
+		Foo.getName();
+		getName();
+		Foo().getName();
+		getName();
+		new Foo.getName();
+		new Foo().getName();
+		new new Foo().getName();
+		// var vue = new Vue({
+		// 	el:'#app',
+		// 	data:{
+		// 		message:'here is a test',
+		// 		msg:'haha'
+		// 	},
+		// 	beforeCreate:function(){
+		// 		//在实例初始化之后，数据观测(data observer) 和 event/watcher 事件配置之前被调用
+		// 		console.log('beforeCreate');
+		// 	},
+		// 	created:function(){
+		// 		//在实例创建之后同步调用，此时实例已经结束解析选项，已建立：数据绑定，计算属性，方法，但是OM没开始编译，$el还不存在，但是实例存在
+		// 		console.log('建立');
+		// 		console.log(this.msg);
+		// 	},
+		// 	beforeMount:function(){
+		// 		//相关的render函数首次被调用
+		// 		console.log('beforeMount');
+		// 	},
+		// 	mounted:function(){
+		// 		//el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子
+		// 		console.log('mounted');
+		// 	},
+		// 	beforeUpdate:function(){
+		// 		//数据更新的时候调用
+		// 		console.log('beforeUpdate');
+		// 	},
+		// 	updated:function(){
+		// 		//已经更新
+		// 		console.log('Updated');
+		// 	},
+		// 	beforeDestroy:function(){
+		// 		//实例销毁之前调用
+		// 		console.log('我马上要消失了');
+		// 	},
+		// 	destroyed:function(){
+		// 		console.log('已消失');
+		// 		//Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。
+		// 	}
+
+		// });
 	</script>
 </body>
 </html>

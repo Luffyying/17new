@@ -1,0 +1,4 @@
+css3中的属性 background-size 的设置小坑：
+一定要以这个顺序：
+background:url(../images/icon-34.png) no-repeat;
+background-size: 100% 100%;
