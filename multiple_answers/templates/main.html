@@ -1,0 +1,49 @@
+<style>
+.bg-primary{
+    background-color: #337ab7;
+}
+.bg-primary a{
+	color: #fff;
+}
+.filterbtn{
+	border-radius: 17px;
+}
+.num{
+	display: inline-block;
+	height: 28px;
+	line-height: 28px;
+	border-radius: 50%;
+	padding: 0 10px;
+	background: red;
+	color: white;
+	position: absolute;
+    right: -14px;
+    top: -12px;
+}
+.scaleiframe{
+	width: 750px; 
+	height: 1000px; 
+	transform: scale(0.5);
+	transform-origin: top center;
+}
+.normaliframe{
+	width: 350px;
+	height: 500px;
+}
+
+</style>
+<div class="container-fluid">
+	<div data-bind="attr: {'class': hideLeftMenu() ? 'hide' : 'col-sm-2'}">
+		<ul class="list-group" data-bind="foreach: menus">
+			<li class="list-group-item" data-bind="css:{'bg-primary': $parent.focusMenu()==id}">
+				<a data-bind="text: title, attr: {href: route}"></a>
+			</li>
+		</ul>
+	</div>
+	<div data-bind="attr: {'class': hideLeftMenu() ? 'col-sm-12' : 'col-sm-10'}">
+		<div data-bind="module: palette, visible: !loading()"></div>
+		<div data-bind="visible: loading()">
+		    <h3 style="padding: 20px 50px"><span class="label label-info">Loading...</span></h3>
+		</div>
+	</div>
+</div>

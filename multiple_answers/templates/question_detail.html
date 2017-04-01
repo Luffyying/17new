@@ -1,0 +1,204 @@
+<style>
+	.bg-info{
+		background-color: #d9edf7;
+	}
+	.bg-list{
+		background-color: #f5f5f5;
+	}
+	.under_line{
+		text-decoration: underline;
+	}
+	.white_list{
+		max-height: 500px;
+		overflow-y: scroll;
+		overflow-x: hidden;
+	}
+</style>
+<form class="form-horizontal">
+	<div class="form-group">
+		<label class="col-sm-1 control-label">编号：</label>
+		<div class="col-sm-2 form_option_text" data-bind="text:question_id"></div>
+	</div>
+     <!-- ko if: content().length >0-->
+
+            <div data-bind="foreach:content">
+                <div class="bg-info subitem" style="margin-top:10px;padding-bottom:10px;">
+
+                    <!-- ko if: [11, 12, 13, 14, 15].indexOf(sub_content_type_id) > -1 -->
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">小题题干：</label>
+                        <div class="col-sm-10 form_option_text content_preview wpre">
+                            <img data-bind="attr: { src: oral_dict.pic_url }" style="max-width: 300px; max-height: 300px;" alt=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label"></label>
+                        <div class="col-sm-10 form_option_text content_preview need-check-spell" data-bind="text: content"></div>
+                    </div>
+                    <!-- /ko -->
+
+                    <!-- ko ifnot: [11, 12, 13, 14, 15].indexOf(sub_content_type_id) > -1 -->
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">小题题干：</label>
+                        <div class="col-sm-10 form_option_text content_preview wpre need-check-spell" style="word-wrap: break-word;" data-bind="html: content"></div>
+                    </div>
+                    <!-- /ko -->
+                     <!-- ko if: sub_content_type_id != 12 && sub_content_type_id != 13 && sub_content_type_id != 14 && sub_content_type_id != 15 -->
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">答案：</label>
+                        <div class="col-sm-10 form_option_text need-check-spell">
+                            <!-- ko foreach : answers-->
+                            <div class="pb_20">
+                                <!-- ko switch: $parent.sub_content_type_id+'' -->
+
+                                <!-- ko case: ['1','2','3','5','11'] -->
+                                <div>
+                                    <b style="word-wrap: break-word;" data-bind="html: String.fromCharCode(1*$data.answer+65)"></b>
+                                    <span data-bind="text: '（分值：'+score_percentage+'）'"></span>
+                                </div>
+                                <!-- /ko -->
+
+                                <!-- ko case: '4' -->
+                                <div>
+                                    <span data-bind="text: '第'+($index()+1)+'空：'"></span>
+                                    <!-- ko if: $data.sub_answers && $data.sub_answers.length>0 -->
+                                        <!-- ko foreach: $data.sub_answers -->
+                                        <b style="word-wrap: break-word;" data-bind="text: $data"></b>
+                                        <b class="mlr8 red" data-bind="visible: $index()<($parent.sub_answers.length-1)">或</b>
+                                        <!-- /ko -->
+                                    <!-- /ko -->
+                                    <!-- ko if: !$data.sub_answers || $data.sub_answers.length==0 -->
+                                    <b style="word-wrap: break-word;" data-bind="html: $data.answer=='' ? '空' : $data.answer"></b>
+                                    <!-- /ko -->
+                                    <span data-bind="text: '（分值：'+score_percentage+'）'"></span>
+                                </div>
+                                <!-- /ko -->
+
+                                <!-- ko case: '10' -->
+                                <div>
+                                    <span data-bind="text: '第'+($index()+1)+'空：'"></span>
+                                    <b style="word-wrap: break-word;" data-bind="html: String.fromCharCode(1*$data.answer+65)"></b>
+                                    <span data-bind="text: '（分值：'+score_percentage+'）'"></span>
+                                </div>
+                                <!-- /ko -->
+
+                                <!-- ko case: $default -->
+                                <div>
+                                    <!-- ko if: $data.classification -->
+                                    <b data-bind="text: classification+'：'"></b>
+                                    <!-- /ko -->
+                                    <b style="word-wrap: break-word;" data-bind="html: $data.answer=='' ? '空' : $data.answer"></b>
+                                    <span data-bind="text: '（分值：'+score_percentage+'）'"></span>
+                                </div>
+                                <!-- /ko -->
+                                <!-- /ko -->
+                                <b class="dib vat">主知识点：</b>
+
+                                <!-- ko if: typeof $parents[1].could_edit_goal != 'undefined' && $parents[1].could_edit_goal -->
+                                <ul class="dib p_0 list-unstyled margin-top" data-bind="foreach: knowledge_points">
+                                    <!-- ko if: main==1 -->
+                                    <li>
+                                        <span class="label label-info" data-bind="text: name"></span>
+                                        <div class="dib goaltag" data-bind="visible: tag_id != 0">
+                                            <i>——</i>
+                                            <span class="label label-danger golatext pr_24" data-bind="text: 'Goal标签：'+tag_name"></span>
+                                            <a href="javascript:void(0);" class="glyphicon glyphicon-remove" data-bind="click: $parents[2].removeGoalTags.bind($data, $parents[2]._id, 0, $parentContext.$index(), id, $parents[2].updated_at)"></a>
+                                        </div>
+                                        <a href="javascript:void(0);" class="markgoal" data-bind="click: $parents[2].getGoalTags.bind($data, $parents[2]._id, $parents[1], $parentContext.$index(), id, $parents[2].updated_at)">标记goal标签</a>
+                                        <div class="dib" data-bind="visible: features.length>0">
+                                            <i>——</i>
+                                            <!-- ko foreach: features -->
+                                            <span class="label label-danger" data-bind="text: '特征：'+name"></span>
+                                            <!-- /ko -->
+                                        </div>
+                                    </li>
+                                    <!-- /ko -->
+                                </ul>
+                                <!-- /ko -->
+
+                                <!-- ko if: typeof $parents[1].could_edit_goal == 'undefinded' || typeof $parents[1].could_edit_goal != 'undefinded'&&!$parents[1].could_edit_goal -->
+                                <ul class="dib p_0 list-unstyled" data-bind="foreach: knowledge_points">
+                                    <!-- ko if: main==1 -->
+                                    <li>
+                                        <span class="label label-info" data-bind="text: name"></span>
+                                        <div class="dib goaltag" data-bind="visible: tag_id != 0">
+                                            <i>——</i>
+                                            <span class="label label-danger golatext" data-bind="text: 'Goal标签：'+tag_name"></span>
+                                        </div>
+                                        <div class="dib" data-bind="visible: features.length>0">
+                                            <i>——</i>
+                                            <!-- ko foreach: features -->
+                                            <span class="label label-danger" data-bind="text: '特征：'+name"></span>
+                                            <!-- /ko -->
+                                        </div>
+                                    </li>
+                                    <!-- /ko -->
+                                </ul>
+                                <!-- /ko -->
+                                <br>
+
+                                <b class="dib vat">知识点：</b>
+                                <ul class="dib p_0 mb_10 list-unstyled" data-bind="foreach: knowledge_points">
+                                    <li class="label label-info" data-bind="text: name"></li>
+                                    <li class="dib" data-bind="visible: features.length>0">
+                                        <i>——</i>
+                                        <!-- ko foreach: features -->
+                                        <span class="label label-danger" data-bind="text: '特征：'+name"></span>
+                                        <!-- /ko -->
+                                    </li>
+                                </ul>
+                                <br>
+
+                                <b class="dib vat">考法：</b>
+                                <ul class="dib list-unstyled" data-bind="foreach: test_methods">
+                                    <li class="dib mr_10">
+                                        <span data-bind="text: name"></span>
+                                        <!-- ko if: main -->
+                                        (主考法)
+                                        <!-- /ko -->
+                                    </li>
+                                </ul>
+                                <br>
+
+                                <b class="dib vat">解法：</b>
+                                <ul class="dib list-unstyled" data-bind="foreach: solution_methods">
+                                    <li class="dib mr_10">
+                                        <span data-bind="text: name"></span>
+                                        <!-- ko if: main -->
+                                        (主解法)
+                                        <!-- /ko -->
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- /ko-->
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- ko if: $parent.subject_id<200 -->
+                    <div class="form-group" data-bind="visible: analysis">
+                        <label class="col-sm-1 control-label">解析：</label>
+                        <div class="col-sm-10 form_option_text need-check-spell" style="word-wrap: break-word;" data-bind="html: analysis"></div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <div class="bg-list white_list margin-top">
+                    <div class="form-group">
+                    <!-- <span data-bind="text:$parents.$parents.isWhite"></span> -->
+                        <label class="col-sm-1 control-label">白名单：</label>
+                        <div class="col-sm-10 form_option_text form_option_text content_preview">
+                            <!-- ko foreach:undermined_answers || check_answers_list || white_list_answers -->
+                                <p><input type="checkbox" data-bind="attr:{checked:$parent.isWhite}"><span>答案正确&nbsp;&nbsp;第</span><span data-bind="text:$index()+1"></span>组<span data-bind="foreach:$data.answers"><span data-bind="text:$data.answers_list"><span data-bind="text:$data"></span></span></span></p>
+                            <!-- /ko -->
+                            <span data-bind="text:$parent.isWhite"></span>
+                            <textarea data-bind="value:$parent.values,visible:$parent.isWhite" placeholder="一行一组正确答案，多个空的答案用逗号隔开" ="" cols="30" rows="5"></textarea>
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+             <!-- <textarea data-bind="value:$parent.values,visible:$parent.isWhite" placeholder="一行一组正确答案，多个空的答案用逗号隔开" ="" cols="30" rows="5"></textarea> -->
+            </div>
+    <!-- /ko -->
+
+</form>
+

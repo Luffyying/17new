@@ -1,0 +1,56 @@
+<style>
+	th,td{
+		text-align: center;
+	}
+	.edit{
+		cursor: pointer;
+	}
+	.descript-info{
+	    color:#1DD44F;
+	}
+	pre {
+	    background-color: #fff;
+	    border: 0px;
+	    border-radius: 0px;
+	    white-space: pre-line;
+	}
+</style>
+<div class="">
+	<label class="form-control-static pull-left mr_20">配置管理</label>
+	<button class="btn btn-primary" data-bind="click:addConfig">添加</button>
+	<table class="table table-bordered margin-top" width="100%">
+		<thead>
+			<tr>
+				<th>学科</th>
+				<th>题目标记的遍数</th>
+				<th>进入题目验证环节的条件</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<!-- ko if:dataList().length >0 -->
+		<tbody data-bind="foreach:dataList">
+			<tr>
+				<td data-bind="text:$data.subject"></td>
+				<td data-bind="text:$data.check_times"></td>
+				<td data-bind="text:$data.condition_text"></td>
+				<td><a href="javascript:void(0);" class="edit" data-bind="click:$parent.edit_config.bind($data)">编辑</a></td>
+			</tr>
+		</tbody>
+		<!-- /ko -->
+		<!-- ko if: dataList().length==0 -->
+			<tbody>
+				<tr>
+					<td colspan="10" align="center">暂无数据</td>
+				</tr>
+			</tbody>
+			<!-- /ko -->
+	</table>
+	<div>
+		<pre class="descript-info">
+			说明：
+            1. 勾选了“所有题目，都需要经过题目验证环节”，则所有标记完成的题目，都需要经过题目验证环节；题目验证环节提交的白名单数据，最终入库；
+            2. 勾选了“多轮标记至少有一次不相同，则需要经过题目验证环节”，则标记完成的题目，多轮标记结果完全相同时，验证标记环节提交的白名单数据，直接入库；只要有一次标记的结果不相同，则需要经过题目验证环节，题目验证环节提交的白名单数据，最终入库
+            3. 题目标记遍数是1遍的时候，系统默认勾选“所有题目，都需要经过题目验证环节”，即题目都需要经过题目验证环节，题目验证环节的白名单数据入库；
+		</pre>
+    </div>
+</div>
