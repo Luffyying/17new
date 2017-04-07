@@ -17,3 +17,17 @@ vue init webpack 项目名字（不能用中文）
 自己手动添加一些文件，比如说样式，可能会报404。
 
 从线上库拉代码到本地，还需要自己手动来装依赖，npm install,它本身是没有的。
+
+
+使用git再本地分支的操作：
+改了一些代码后，想要提交到远程，这时候你需要：
+git status
+查看下修改的以及新增的文件，如果有新增的，则git add commponents/question.vue
+再次查看
+git status,当没有改动了之后，
+git commit -m "update"(update 是提交的注释)
+git pull
+从远程拉一遍代码
+git push origin wwy (其中wwy为自己所在分支的名称)
+如上操作就实现了将自己的本地修改提交到远程。
+
