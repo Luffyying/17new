@@ -31,3 +31,15 @@ git pull
 git push origin wwy (其中wwy为自己所在分支的名称)
 如上操作就实现了将自己的本地修改提交到远程。
 
+接下来你可能会操作与其他分支的合并，比如将自己的分支合并到master:
+首先切换到master
+git checkout master
+更新
+git pull origin master
+合并
+git merge wwy
+推到远程
+git push origin master
+再切回自己的分支：
+git checkout wwy
+
