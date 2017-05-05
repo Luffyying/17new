@@ -97,8 +97,8 @@ small tip:
 当你使用（32）E:not(s)的时候，尽量指明父类E，如果不指明，则会导致HTML，body下的相关属性发生变化，且达不到你要的效果，比如字体，默认是继承body的，导致
 选择器失效。
 :not(p){
-			color:blue;
-		};
+	color:blue;
+};
 
 
 
