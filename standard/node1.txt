@@ -13,4 +13,7 @@ return { unfold:this.isFold}
 js:驼峰 localStorage
 html:按照w3c的标准，标签和属性名是不区分大小写的，可以使用中划线 <div data-bind="">
 css:学习bootstrap得命名方式，推荐中划线 line-height   /  -webkit-transition
-
+4.混乱的逻辑方式
+类似于这种的{{this.subq.answerResult.correct==false?"回答错误":"回答正确"}}三目运算
+==false 这种写法来进行布尔判断，很糟糕，空的字符串和false也相等，你不知道传过来的数据是什么，所以还是要保证代码的健壮性
+5.功能写好了之后，回过头来，review下自己的代码。
