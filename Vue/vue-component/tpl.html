@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui"/>
+    <meta content="yes" name="apple-mobile-web-app-capable"/>
+    <meta content="black" name="apple-mobile-web-app-status-bar-style"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <title>vue - 列车时刻表</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">
+  <h1>vue - 列车时刻表</h1>
+</div>
+
+<div class="app">
+  <ul class="sort-bar">
+    <li class="sort-item">
+      出发时间
+      <i class="icon-sort up"></i>
+    </li>
+    <li class="sort-item">
+      耗时
+      <i class="icon-sort"></i>
+    </li>
+    <li class="sort-item">
+      价格
+      <i class="icon-sort"></i>
+    </li>
+  </ul>
+
+
+  <ul class="list-box">
+      <li class="list-item">
+        <div class="train-number">
+          <div class="fl">K1805 | 其它</div>
+          <div class="fr">2小时7分</div>
+        </div>
+
+        <div class="train-detail">
+          <div class="departure">
+            <span class="departure-time">06:29</span>
+            <span class="departure-attr"><i class="icon-circle s-icon1"></i>上海南</span>
+            <span class="fr price">￥28.5起</span>
+          </div>
+
+          <div class="arrival">
+            <span class="arrival-time">06:29</span>
+            <span class="arrival-attr"><i class="icon-circle s-icon2"></i>杭州东</span>
+            <span class="fr">2598张</span>
+          </div>
+        </div>
+
+        <div class="train-info">
+          <span>硬座(555) </span>
+          <span>硬卧(1653) </span>
+          <span>软卧(56) </span>
+          <span>无座(334) </span>
+        </div>
+      </li>
+
+      <li class="list-item">
+        <div class="train-number">
+          <div class="fl">K1805 | 其它</div>
+          <div class="fr">2小时7分</div>
+        </div>
+
+        <div class="train-detail">
+          <div class="departure">
+            <span class="departure-time">06:29</span>
+            <span class="departure-attr"><i class="icon-circle s-icon1"></i>上海南</span>
+            <span class="fr price">￥28.5起</span>
+          </div>
+
+          <div class="arrival">
+            <span class="arrival-time">06:29</span>
+            <span class="arrival-attr"><i class="icon-circle s-icon2"></i>杭州东</span>
+            <span class="fr">2598张</span>
+          </div>
+        </div>
+
+        <div class="train-info">
+          <span>硬座(555) </span>
+          <span>硬卧(1653) </span>
+          <span>软卧(56) </span>
+          <span>无座(334) </span>
+        </div>
+      </li>
+
+  </ul>
+
+
+  <ul class="filter-bar">
+    <li class="filter-item">
+      车次类型
+      <i class="icon-sec"></i>
+    </li>
+    <li class="filter-item">
+      出发站
+      <i class="icon-sec"></i>
+    </li>
+    <li class="filter-item">
+      更多
+      <i class="icon-sec"></i>
+    </li>
+  </ul>
+</div>
+
+</body>
+</html>

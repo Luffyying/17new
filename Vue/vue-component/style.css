@@ -1,0 +1,223 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font: 400 14px/1.5 Arial, "Lucida Grande", Verdana, "Microsoft YaHei", hei;
+}
+
+body {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  background-color: #efefef;
+  overflow-x: hidden;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+
+.icon-sort {
+  position: relative;
+  margin: 0 0 0 8px;
+  border-top: 4px solid #c3c3c3;
+  border-right: 4px solid #c3c3c3;
+  border-bottom: 4px solid #c3c3c3;
+  border-left: 4px solid #c3c3c3;
+  bottom: 1px;
+  display: inline-block;
+   -webkit-transform: rotate(-225deg);
+  transform: rotate(-225deg);
+}
+.icon-sort.up {
+  display: inline-block;
+   -webkit-transform: rotate(-225deg);
+  transform: rotate(-225deg);
+     border-bottom: 4px solid #02ad56;
+  border-left: 4px solid #02ad56;
+}
+
+.icon-sort.down {
+  display: inline-block;
+   -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+     border-bottom: 4px solid #02ad56;
+  border-left: 4px solid #02ad56;
+}
+
+.icon-sort::before {
+  content: '';
+  position: absolute;
+  top: 0px;
+  left: -8px;
+  width: 18px;
+  height: 2px;
+  background-color: #fff;
+  -webkit-transform: rotate(-135deg);
+  transform: rotate(-135deg);
+}
+
+
+.icon-circle {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid
+}
+
+
+.icon-sec {
+  position: relative;
+  top: -4px;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  vertical-align: middle;
+  border-left: 1px solid;
+  border-bottom: 1px solid;
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  margin-left: 5px;
+}
+.active .icon-sec {
+  top: 1px;
+  -webkit-transform: rotate(135deg);
+  transform: rotate(135deg);
+}
+
+.header {
+  position: fixed;
+  width: 100%;
+  height: 50px;
+  line-height: 50px;
+  background-color: #00b358;
+  color: #fff;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 18px;
+  line-height: 50px;
+  margin: 0;
+}
+
+
+.app {
+  padding: 86px 0 50px 0;
+}
+
+.list-box {
+
+}
+
+.list-item {
+  border: 1px solid #e5e5e5;
+  margin: 8px 0;
+  background-color: #fff;
+  height: 110px;
+}
+
+.train-number,
+.train-detail,
+.train-info {
+  clear: both;
+  padding: 0 15px;
+}
+
+.train-number {
+  height: 32px;
+  line-height: 32px;
+}
+.train-detail .departure,
+.train-detail .arrival {
+  height: 26px;
+  line-height: 26px;
+}
+.train-info {
+  height: 21px;
+  line-height: 21px;
+}
+
+.list-item .price {
+  font-family: Arial;
+  color: #fd8f01;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.list-item .departure-time,
+.list-item .arrival-time {
+  display: inline-block;
+  width: 50px;
+}
+
+.list-item .s-icon1 {
+  margin: 0 5px;
+  border-color: #00B358;
+}
+.list-item .s-icon2 {
+  margin: 0 5px;
+  border-color: #f06463;
+}
+
+.list-item .departure-time,
+.list-item .departure-attr {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+
+.sort-bar {
+  display: flex;
+  width: 100%;
+  height: 36px;
+  line-height: 36px;
+  background-color: #fff;
+  top: 50px;
+  left: 0;
+  position: fixed;
+  border-bottom: 1px solid #EAEAEA;
+  text-align: center;
+}
+
+.sort-item {
+  flex: 1;
+}
+
+
+.filter-bar {
+  display: flex;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  height: 36px;
+  line-height: 36px;
+  background-color: #fcfcfc;
+  width: 100%;
+  text-align: center;
+}
+
+.filter-item {
+  flex: 1;
+  border-left: 1px solid #d2d2d2;
+  border-top: 1px solid #d2d2d2;
+}
+.filter-item:first-child {
+  border-left: 0;
+}
