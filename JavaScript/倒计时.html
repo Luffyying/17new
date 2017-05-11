@@ -1,0 +1,135 @@
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>document</title>
+		<link rel="stylesheet" href="">
+		<style>
+			
+		</style>
+	</head>
+	<body>
+	<span id="contdown"></span>
+		<script>
+			/* 第一版*/
+			var time;
+			var a = 50;
+            
+            	time = setInterval(function(){
+				console.log(a);
+				a--;
+				if(a<0){
+					 clearInterval(time);
+				}
+				},100);
+            	
+          /* 第二版*/
+          window.onload = function(){
+          	showTime();
+          	//处理格式问题
+          	function addZero(i){
+          		if(i<10){
+          			i = '0' + i;
+          		}
+          		return i;
+          		//没有考虑类型转换
+          	}
+          	function showTime(){
+          		var nowTime = new Date();
+          		var endTime = new Date("2017/05/10,20:20:20");
+          		var leftTime = parseInt((endTime.getTime() - nowTime.getTime())/1000);
+          		var s = parseInt(leftTime % 60);
+          		var d = parseInt(leftTime / (24 * 60 * 60));
+        		var h = parseInt(leftTime / (60 * 60) % 24);
+        		var m = parseInt(leftTime / 60 % 60);
+        		h = addZero(h);
+        		m = addZero(m);
+        		s = addZero(s);
+		        document.getElementById("contdown").innerHTML = "倒计时    " + d + ":" + h + ":" + m + ":" + s;
+		        if(leftTime<=0){
+		            document.getElementById("contdown").innerHTML = "活动已结束";
+		            return;
+		        } 
+		        setTimeout(showTime,1000);
+		        }
+
+		    }
+
+		    /*第三版 面向对象*/
+		    var CountDown = {
+		    	$: function(id){},
+		    	//执行时的入口函数
+		    	init:function(startTime,endTime,el)
+		    	_time:function(startTime,endTime,el)
+		    }
+		    CountDown.init("contdown","2017,04,23 9:34:44","countdown1");
+
+		    function CountDown(elem,startTime,endTime){
+		    	this.elem = elem;
+		    	this.startTime = (new Date(startTime).getTime())?(new Date(startTime).getTime()):(new Date().getTime());
+		    	this.endTime = endTime;
+		    }
+		    CountDown.prototype = {
+		    	SetTime :function(){},
+		    	leftPad: function(n) {},
+				DownTime: function() {}
+		    }
+		    var t = new CountDown("time","2016/1/30,12:20:12","2017/1/30,12:20:12");
+		    t.SetTime();
+
+		    /*面向对象的改进 没有考虑setInterval 和setTimeout的影响*/
+		    var cd = {};
+		    cd.leftPad = function(n,len){}
+		    cd.timeToSecond = function(t){};
+		    /** 
+		    	*倒计时工厂
+		    	*@param {[object]} obj 倒计时配置信息
+		    	*return {[object]} 返回一个倒计时对象
+		    	*/
+		    cd.create = function(obj){
+		    	var o = {};
+		    	o.dom = document.getElementById(obj.id);
+		    	o.startMS = +new Date(obj.startTime || 0 );
+		    	o.endMS = +new Date(obj.endTime || 0 );
+		    	obj.totalTime && (o.totalTime = cd.timeToSecond(obj.totalTime));
+
+		    	var newcd = new cd.style[obj.style](0);
+		    	newcd.go = function(callback){
+		    		callback && (newcd.callback = callback);
+		    		newcd.render();
+		    		clearInterval(newcd.timer);
+		    		newcd.timer = setInterval(newcd.render,1000);
+		    	};
+		    	return newcd;
+		    }
+		    cd.style.style1 = function(obj){
+		    	this.dom = obj.dom;
+		    	this.startMS = obj.startMS;
+		    	this.endMS = obj.endMS;
+		    	this.endMS = obj.endMS;
+			    var _this = this;
+			    this.render = function() {
+			        var currentMS = +new Date();
+			        var diff = (_this.endMS - currentMS) / 1000;
+			        var d = parseInt(diff / 60 / 60 / 24);
+			        d = countdown.leftPad(d, 3);
+			        d = d.replace(/(\d)/g, '<span>$1</span>');
+			        _this.dom.innerHTML = '距离国庆节还有：' + d + '天';
+			        if (currentMS > _this.endMS) {
+			            clearInterval(_this.timer);
+			            if (_this.callback) {
+			                _this.callback();
+			            } else {
+			                _this.dom.innerHTML = '国庆节倒计时结束';
+			            }
+			        }
+			    };
+		    }
+		    countdown.style.style2 = function(obj) {};
+			countdown.style.style3 = function(obj) {};
+			countdown.create({id:"clock3",totalTime:'82:23',style:'style1'}).go(function(){alert('It is over');});
+
+           
+			
+		</script>
+	</body>
+</html>
