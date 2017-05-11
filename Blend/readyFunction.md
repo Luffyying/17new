@@ -32,13 +32,25 @@ $:
 2.多次使用的问题，onload，一次只能保存对一个函数的引用,会覆盖,但是，ready就可以，会在现有的行为上追加新的行为，这些行为函数会根据注册的顺序依次执行。
 
 
-3.还有一个以前不知道的，一般像onload事件之类的使用匿名函数执行，即window.onload = function(){show()}这种形式才是在所有元素加载完毕之后才执行，
+3.还有一个以前不知道的，一般像onload事件之类的使用匿名函数执行，即window.onload = function(){show()}这种形式才是在所有元素加载完毕之后才执行
 
+function(){show()}这种形式才是在所有元素加载完毕之后才执行，
+
+	<body>
+	</script>
 		function show(){
+			alert($('span').text());
 			alert('lletet');
 		}
-
 		window.onload = function(){
 			show();
 		}
-		window.onload = show();
+
+		//window.onload = show();
+	</script>
+	<span>jjjjkjkj</span>
+	</body>
+
+
+（head中的脚本：head中存放的脚本是需要调用才执行的脚本，或者是事件触发执行的脚本
+，但是body部分中的脚本，是页面被加载的时候执行的，故放在body部分的脚本通常来被用作生成页面。这样可以看到效果，估计是alert()有延迟，阻塞了进程）
