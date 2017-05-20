@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<!-- <div @click="show" id="app" v-once>表示不会再次更新
+	  {{ message }}
+	</div> -->
+	<div id="app">
+		<button @click="addItem">添加</button>
+		<input type="text" v-model="val" @keyup.enter="addItem">
+		<ul>
+			<li v-for="(item,index) in items">
+				<span>{{item}}</span>
+				<button @click="delItem(index)">X</button>
+			</li>
+		</ul>
+	</div>
+
+
+	<div id="todo-list-example">
+	  <input
+	    v-model="newTodoText"
+	    v-on:keyup.enter="addNewTodo"
+	    placeholder="Add a todo"
+	  >
+	  <ul>
+	    <li
+	      is="todo-item"
+	      v-for="(todo, index) in todos"
+	      v-bind:key="todo"
+	      v-bind:title="todo"
+	      v-on:remove="todos.splice(index, 1)"
+	    ></li>
+	  </ul>
+	</div>
+ 
+ 	<div id="counter-event-example">
+	  <p>{{ total }}</p>
+	  <button-counter v-on:increment="incrementTotal"></button-counter>
+	  <button-counter v-on:increment="incrementTotal"></button-counter>
+	</div>
+
+	<div id="ha">
+	  <p>{{ total }}</p>
+	  <button-count v-on:add="countAll"></button-count>
+	  <button-count v-on:add="countAll"></button-count>
+	</div>
+
+	<script src="https://unpkg.com/vue"></script>
+	<script>
+		// var app = new Vue({
+		//   el: '#app',
+		//   data: {
+		//     message: 'Hello Vue!',
+		//     items:[],
+		//     val:''
+		//   },
+		//   methods:{
+		//   	show:function(){
+		//   		console.log('hello vue');
+		//   	},
+		//   	delItem:function(index){
+		//   		this.items.splice(index,1);
+		//   	},
+		//   	addItem:function(){
+		//   		console.log('add');
+		//   		app.items.push(app.val);
+		//   	}
+		//   }
+		// });
+		//come true a todo list by component
+		Vue.component('todo-item',{
+			template:`
+				<li>
+				   {{title}}
+				   <button @click="$emit('remove')">X</button>
+				</li>
+			`,
+			props:['title']
+		})
+		var app = new Vue({
+			el:"#todo-list-example",
+			data:{
+				newTodoText:'',
+				todos:[
+						'Do the dishes',
+					    'Take out the trash',
+					    'Mow the lawn'
+					],
+				arr:[2,3,4]
+			},
+			methods:{
+				addNewTodo:function(){
+					this.todos.push(this.newTodoText);
+					this.newTodoText = '';
+					//直接使用this
+				}
+			}
+		});
+		//example v-on
+		Vue.component('button-counter',{
+			template:'<button v-on:click="increment">{{counter}}</button>',
+			data:function(){
+				return {
+					counter:0
+				}
+			},
+			methods:{
+				increment:function(){
+					this.counter +=1;
+					this.$emit('increment',5)//回调 调用父组件中的方法
+				}
+			}
+		});
+        
+		new Vue({
+		  el: '#counter-event-example',
+		  data: {
+		    total: 0
+		  },
+		  methods: {
+		    incrementTotal: function (index) {
+		      this.total += 1
+		    }
+		  }
+		})
+
+		Vue.component('button-count',{
+			template:'<button v-on:click="add">{{counter}}</button>',
+			data:function(){
+				return {
+					counter:0
+				}
+			},
+			methods:{
+				add:function(){
+					this.counter +=1;
+					this.$emit('add');
+				}
+			}
+		});
+		var vm = new Vue({
+			el:"#ha",
+			data:{
+				total:0
+			},
+			methods:{
+				countAll:function(){
+					this.total+=1;
+				}
+			}
+		});
+//vue组件 的API来自三个部分，props ,events, slots
+//props 允许外部环境传递数据给组件
+//slots允许外部环境将额外的内容组合在组件中
+//2017/5/15  基础的过了一遍s
+
+
+
+		// setInterval(()=>{
+		// 	app.message +='skd';
+		// },2000);
+		//MVVM:model view viewModel
+	</script>
+</body>
+</html>
