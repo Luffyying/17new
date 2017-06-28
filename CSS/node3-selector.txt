@@ -1,4 +1,4 @@
-css选择器详情（when you forget it ,throw a quick glace）
+﻿css选择器详情（when you forget it ,throw a quick glace）
 1.基本选择器
 （1）* : 通用选择器，匹配任何元素，但是它在类的应用中和其他类是一样的，与定义顺序无关，只与使用顺序有关
 （2）E : 标签选择器，匹配所有使用E标签的元素
@@ -99,7 +99,13 @@ small tip:
 :not(p){
 	color:blue;
 };
-
+一个面试的栗子：
+当输入框内满足条件的时候才将按钮完全显示，其他情况是半透明的状态
+input[name='test']:required:invalid + .btn{
+            opacity: 0.6
+        }
+ <input name="test" required="required" type="text" pattern="[0-9]{3,4}">
+    <button class="btn">next</button>
 
 
 
