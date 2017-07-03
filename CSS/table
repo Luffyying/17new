@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<table border="1" cellspacing="" cellpadding="">
+			<tr>
+				<th  rowspan="3">保障项目</th>
+				<th  colspan="3">保险金额（单位：人民币）</th>
+			</tr>
+			<tr>
+				<th  colspan="3">华泰携程境内旅游保险</th>
+			</tr>
+			<tr>
+				<th>普通型</th>
+				<th>经典型</th>
+				<th>尊贵型</th>
+			</tr>
+			<tr>
+				<td colspan="4">个人意外伤害和医疗保障</td></tr>
+			<tr><td>意外身故或残疾</td>
+				<td>10万元</td>
+				<td>20万元</td>
+				<td>50万元</td>
+			</tr>
+			<tr><td>--其中公共交通工具意外身故或残疾</td>
+				<td>20万元</td>
+				<td>40万元</td>
+				<td>100万元</td>
+			</tr>
+			<tr><td>住院医疗费用（意外、急性病所致）</td>
+				<td rowspan="3">1万</td>
+				<td rowspan="3">2万</td>
+				<td rowspan="3">3万</td>
+			</tr>
+				<tr><td>门诊医疗费用（意外、急性病所致）</td>
+				
+			</tr>
+			<tr><td>牙科医疗费用（意外所致）</td>
+				
+				
+			</tr>
+			<tr><td>急性病住院津贴（90日为限）</td>
+				<td>20万元</td>
+				<td>40万元</td>
+				<td>100万元</td>
+			</tr>
+			<tr><td>个人财务保障</td>
+				<td>20万元</td>
+				<td>40万元</td>
+				<td>100万元</td>
+			</tr>
+			<tr><td>个人现金保障</td>
+				<td>20万元</td>
+				<td>40万元</td>
+				<td>100万元</td>
+			</tr>
+			<tr><td>旅行证件遗失</td>
+				<td>20万元</td>
+				<td>40万元</td>
+				<td>100万元</td>
+			</tr>
+		</table>
+	</body>
+</html>
