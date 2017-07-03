@@ -1,0 +1,36 @@
+function fruits(){
+
+		}
+		fruits.prototype = {
+			color:'red',
+			say:function(a,b){
+				console.log('my color is'+ this.color+a+b);
+			}
+		}
+		var apple = new fruits();
+		apple.say(5,7);
+		banana = {
+			color:'green'
+		}
+		apple.say.call(banana,2,8);
+		apple.say.apply(banana,[2,3]);
+		var foo = {
+			barss:1,
+			eventBind:function(){
+				var _this = this;
+				$('.book').on('click',function(){
+					console.log(_this.barss);
+					console.log(this.barss);}.bind(this))
+				//bind绑定的参数会传入到响应的函数中
+			}
+		}
+		foo.eventBind();
+		var bar = function(){
+			console.log(this.barss);
+		}
+		bar();
+		var k = bar.bind(foo);//将this指向foo
+		k();
+		//多次bind是无效的
+		var k = bar.bind(foo).bind({});
+		//call apply 与bind的最大不同之处在于bind不是立即执行的
