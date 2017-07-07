@@ -1,0 +1,1 @@
+在ES6以前，在setTimeout 和 setInterval中，this的值都是指向window对象，如果是ES6则指向VueComponent
