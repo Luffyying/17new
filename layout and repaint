@@ -1,0 +1,30 @@
+（总结自阮一峰老师的博客：http://www.ruanyifeng.com/blog/2015/09/web-page-performance-in-depth.html）
+重排和重绘：
+1.重排/回流，这两是指一个意思，针对浏览器的不同而叫法不同，指重新生成布局
+2.重绘：重新绘制，可能是改变背景色之类的 
+重排一定重绘，重绘不一定重排，过多的这些情况，可能会影响网页性能。因为DOM变动和样式变动，必然会引起重排或者重绘，但是这样会很消耗资源，降低性能，但是现在
+浏览器较为智能，尽量避免多次重新渲染，像改变这些属性就会立即重新渲染：
+
+    offsetTop/offsetLeft/offsetWidth/offsetHeight
+		scrollTop/scrollLeft/scrollWidth/scrollHeight
+		clientTop/clientLeft/clientWidth/clientHeight
+		getComputedStyle()
+3.从性能角度考虑，尽量不要把读操作和写操作，放在一个语句里面。
+// bad
+div.style.left = div.offsetLeft + 10 + "px";
+div.style.top = div.offsetTop + 10 + "px";
+
+// good
+这就是当我们频繁操作一个DOM元素的时候，尽量缓存下来。
+var left = div.offsetLeft;
+var top  = div.offsetTop;
+div.style.left = left + 10 + "px";
+div.style.top = top + 10 + "px";
+一般的规则是：
+样式表越简单，重排和重绘就越快。
+重排和重绘的DOM元素层级越高，成本就越高。
+table元素的重排和重绘成本，要高于div元素
+
+display:none不占据空间，visibility:hidden占据空间
+position属性为absolute或fixed的元素，重排的开销会比较小，因为不用考虑它对其他元素的影响。
+只在必要的时候，才将元素的display属性为可见，因为不可见的元素不影响重排和重绘。另外，visibility : hidden的元素只对重绘有影响，不影响重排。
