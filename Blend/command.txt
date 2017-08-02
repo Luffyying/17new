@@ -6,7 +6,8 @@ ctrl+/:对所选区域添加注释或者取消注释
 ctrl+d:先选中内容，搜索其他一样的内容
 ctrl+f:查找
 ctrl+shift+d:将光标放置一行末尾，用于复制
-
+ctrl+[  /  ctrl+]  :成批次的向左/向右移动
+ctrl + g:锁定代码所在的行数
 使用npm的一些安装命令：
 npm install vue-router --save 其中--save作用是自动把模块和版本号添加到dependencies部分
 省掉你手动修改package.json文件的步骤
