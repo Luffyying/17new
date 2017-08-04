@@ -1,0 +1,8 @@
+之前一直没有用过这个jq方法，今天用到了，off的意思是移除某个事件，on的意思是添加某个事件，栗子：
+<a href="javascript:void(0);" class="link_book_knowledge" style="color:blue">批量添加教材挂载知识点</a>
+对于这个链接，实现点击的效果，可以这样：
+$('.link_book_knowledge').off('click').on('click', function() {
+			console.log("trigger single");
+			
+		});
+用处：可以移除一些自带的方法，添加自定义的方法。
