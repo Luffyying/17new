@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>在一个函数中return的作用</title>
+	<link rel="stylesheet" href="">
+</head>
+<body>
+	<script>
+		function test(){
+			console.log('000');
+			if(true) return ;
+
+			console.log('lalala');
+			// if(true) return ;s
+
+		}
+		console.log(test())//undefined
+		/*在一个有返回值的函数中，return代表返回值，没有返回值的函数中，也可以有返回值，终端当前执行的函数*/
+		/*在js事件中调用函数时用return 返回值实际上是对window.event.returnvalue进行设置,而直接执行的时候则不用对其进行设置*/
+		//example
+		function add_onclick(){
+			debugger;
+			console.log('sss');
+			return false;
+		}
+	</script>
+	<a href="baidu.com" onclick="return add_onclick()">open1</a>
+	<a href="baidu.com" onclick="add_onclick()">open2</a>
+</body>
+</html>
