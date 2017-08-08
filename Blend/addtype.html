@@ -1,0 +1,100 @@
+<!--添加类型的模板-->
+<div class="modal fade" id="addTypeCasten" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width: 800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">添加类型</h4>
+            </div>
+            <div class="modal-body" >
+                <!-- 针对自然拼读的添加sentence id功能 -->
+                  <!-- ko if:pageData.currentType().config_type==26-->
+                      <div class="form-group" style="height: 115px">
+                        <label class="col-sm-2">sentence ID：</label>
+                        <div class="col-sm-7">
+                          <textarea  class="form-control" data-bind="value:pageData.base_application_spell_obj.sentenceIds" name="" id="" cols="40" rows="5" placeholder="请填写sentence ID,一行一个"></textarea>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <hr>
+                      </div>
+                  <!-- /ko-->
+                <div style="float:left; margin-top:10px;">
+                    <div >
+                        <b> 分类:</b>
+                         <!-- ko if:pageData.currentType().config_type==17-->
+                        <select style="width:300px;"  class="form-control" data-bind="options:pageData.base_application_obj.category_types,value:pageData.base_application_obj.tags,optionsText: '0'"> 
+                        </select>
+                        <!-- /ko-->
+                         <!-- ko if:pageData.currentType().config_type==26-->
+                        <select style="width:300px;"  class="form-control" data-bind="options:pageData.base_application_spell_obj.category_types,value:pageData.base_application_spell_obj.tags,optionsText: '0'"> 
+                        </select>
+                        <!-- /ko-->
+                    </div>
+                    <div class="checkbox">
+                          <label>
+                               <!-- ko if:pageData.currentType().config_type==17-->
+                                <input type="checkbox" data-bind="checked:pageData.base_application_obj.all_choose" />全选
+                              <!-- /ko-->
+                              <!-- ko if:pageData.currentType().config_type==26-->
+                                    <input type="checkbox" data-bind="checked:pageData.base_application_spell_obj.all_choose" />全选
+                              <!-- /ko-->
+                         </label>
+                    </div>
+                    <!-- ko if:pageData.currentType().config_type ==17-->
+                    <!-- ko if: pageData.base_application_obj.tags-->
+                    <div style="width:380px;padding:0px;border:0px solid #ff5ee1; text-align: left;" data-bind="foreach:pageData.base_application_obj.tags()[1]"><!--select_data-->
+                        <div style="display: inline-block;box-sizing: border-box;width: 80px;height: 40px;">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" data-bind="checkedValue:$data[0]+','+$data[1],checked: $parent.pageData.base_application_obj.current_node" />
+                                <!--ko text:$data[1]--><!--/ko-->
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                    <!-- ko if:pageData.currentType().config_type==26-->
+                     <!-- ko if: pageData.base_application_spell_obj.tags -->
+                    <div style="width:380px;padding:0px;border:0px solid #ff5ee1; text-align: left;" data-bind="foreach:pageData.base_application_spell_obj.tags()[1]"><!--select_data-->
+                        <div style="display: inline-block;box-sizing: border-box;width: 80px;height: 40px;">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" data-bind="checkedValue:$data[0]+','+$data[1],checked: $parent.pageData.base_application_spell_obj.current_node" />
+                                <!--ko text:$data[1]--><!--/ko-->
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </div>
+                <div style="float:right;width:380px;min-height:400px; background:azure;margin-top:10px;padding-bottom:10px;border-radius:2px;">
+                         <b> 已选中</b>：
+                         <!-- ko if:pageData.currentType().config_type==17-->
+                         <div data-bind="foreach:pageData.base_application_obj.current_node">
+                             <span class="tag label label-info" style="line-height: 25px;margin-right:5px;float:left;">
+                                 <span data-bind="text:$data.slice($data.indexOf(',')+1)"></span>
+                                  <i data-bind="click:function(){$parent.pageData.base_application_obj.current_node.remove($data)}" style="cursor:pointer;" class="glyphicon glyphicon-remove">
+                                 </i>
+                             </span>
+                        </div>
+                        <!-- /ko -->
+                         <!-- ko if:pageData.currentType().config_type==26-->
+                         <div data-bind="foreach:pageData.base_application_spell_obj.current_node">
+                             <span class="tag label label-info" style="line-height: 25px;margin-right:5px;float:left;">
+                                 <span data-bind="text:$data.slice($data.indexOf(',')+1)"></span>
+                                  <i data-bind="click:function(){$parent.pageData.base_application_spell_obj.current_node.remove($data)}" style="cursor:pointer;" class="glyphicon glyphicon-remove">
+                                 </i>
+                             </span>
+                        </div>
+                        <!-- /ko -->
+                </div>
+                <div style="clear: both;">
+                    <div style="text-align: center;padding:20px;">
+                          <!-- <button type="button" class="btn btn-warning" data-dismiss="modal" data-bind="click:pageData.cancelModal">取消</button>-->
+                          <button type="button" class="btn btn-primary" data-bind="click:pageData.confirm">确定</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
