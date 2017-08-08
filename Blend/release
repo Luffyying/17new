@@ -1,0 +1,1599 @@
+define(['knockout', 'Tools', 'KnowledgePointSelectV2', 'BookTreeSelectV2', 'UrlUtils', 'edit_config_plugin_batch','popbox', 'ko-datepicker', 'jquery-ui', 'ko-mapping', 'ko-switch', 'ko-datepicker', "koStringArray"], function (ko, $tools, KnowledgePointSelectV2, BookTreeSelectV2, UrlUtils, BatchPlugin) {
+    return function (context) {
+        var self = this;
+        self.parent = context.parent;
+        self.data = context.data;
+        self.loading = self.parent.loading;
+        self.v = ko.observable('');
+        self.newCurrentType = ko.observable('');
+        self.newCurrentIndex = ko.observable('0');
+        self.loading(false);
+        self.current_subject_id = ko.observable('');
+        //存储section list
+        self.sectionInfor = ko.observableArray([]);
+        //存储已选的section
+        self.selectedSectionTag = ko.observable({});
+        //题目（配置结构）删除
+        self.removeItem = function(i,j){
+            self.question_constructs_arr()[i].splice(j,1);
+        }
+        //新增的时候对考法，解法等初始化
+        self.initKnowldegePoint = function(){
+             setTimeout(function(){
+                 $('.section').each(function(i){
+                    $(this).tagsinput({
+                        allowDuplicates:false,
+                        itemValue:'id',
+                        itemText:'text'
+                    });
+                    var _this = $(this);
+                    $(this).parent().children('.bootstrap-tagsinput').children('input').on('click',function(){
+                        _this.trigger('click');
+                    });
+                });
+                KnowledgePointSelectV2('.kpselect', self.current_subject_id());
+                //考法
+                KnowledgePointSelectV2(createObj('.test-method-select','/test-method/get-children','/test-method/get-all-test-methods'));
+                //解法
+                KnowledgePointSelectV2(createObj('.solution-method-select','/solution-method/get-children','/solution-method/get-all-solution-methods'));
+                //标记特征的文本框
+                KnowledgePointSelectV2(createObj('#markFeature'));
+                //隐藏知识点tagsinput
+                $('#markFeature + .bootstrap-tagsinput').css("display","none");
+                BookTreeSelectV2('.book_tree_select', self.current_subject_id());
+                $('.read-and-recite .bootstrap-tagsinput').css("display","none");
+                BatchPlugin.linkSelectEvent(self);
+
+            },200);
+        }
+        //添加题目（配置ID）
+        self.addConfigId = function(){
+            var a = ko.mapping.fromJS(question_id_map);
+            a.related_catalog.push({section_id:ko.observable(''),section_name:ko.observable('')});
+            self.question_id_obj_arr.push(a);
+            self.initKnowldegePoint();
+        }
+        //添加题目（配置结构）
+        self.addConstruct = function(){
+            var b = ko.mapping.fromJS(question_construct_map);
+            b.related_catalog.push({section_id:ko.observable(''),section_name:ko.observable('')});
+            self.question_construct_obj_arr.push(b);
+            var newQues = ko.observableArray([]);
+            newQues.push(b);
+            self.question_constructs_arr.push(newQues);
+            self.initKnowldegePoint();
+             //新增的時候只保留字段
+            self.question_constructs_arr()[self.question_constructs_arr().length-1].splice(0,1);
+        }
+        self.delAiItem = function(index){
+            self.question_ai().scene_ids.splice(index,1);
+        }
+        //针对不同类型选择关联节点
+        self.selectSection = function(index){
+            // debugger;
+            self.newCurrentIndex(index);
+            //different type
+             if(typeof this.type =='number'){
+                self.newCurrentType(this.type);
+             }else if(!(this instanceof Array)){
+                self.newCurrentType(this.type());
+             }
+             console.log(this);
+             if(this instanceof Array){
+                if(this.length==0){
+                    self.newCurrentType('1');
+                }else{
+                    if(typeof this[0].type=='number'){
+                        self.newCurrentType(this[0].type);
+                    }else{
+                        self.newCurrentType(this[0].type());
+                    }
+                }
+             }
+            $('#addSectionPanel').modal('show');
+        }
+        self.selectTags = function(s){
+            // debugger;
+            var id= this.section_id;
+            var name= this.section_name;
+            if(self.newCurrentType()==1){
+                $('.sec1').each(function(i){
+                    if(i==self.newCurrentIndex()){
+                        $(this).tagsinput('add',{id:id,text:name});
+
+                    }
+                });
+            }else if(self.newCurrentType()==5){
+                self.question_id_obj_arr()[self.newCurrentIndex()].related_catalog()[0].section_id(this.section_id);
+                self.question_id_obj_arr()[self.newCurrentIndex()].related_catalog()[0].section_name(this.section_name);
+                $('.sec2').each(function(i){
+                    if(i==self.newCurrentIndex()){
+                        $(this).tagsinput('add',{id:id,text:name});
+
+                    }
+                });
+            }else if(self.newCurrentType()==7){
+                $('.sec3').tagsinput('add',{id:id,text:name});
+            }
+            $('#addSectionPanel').modal('hide');
+
+        }
+        //题目（配置结构）模型
+        var question_construct_map = {
+            'type': 1,
+            'kp_id_obj': '',
+            'content_type_id_obj': '',
+            'content_type_2_id_obj': '',
+            'question_count': 0,
+            'difficulties_obj': [],
+            'related_catalog':[]//关联section
+        };
+        //题目（配置结构）新模型
+        var question_construct_map_new = {
+            'type': 11,
+            'kp_id_obj': '',
+            'content_type_id_obj': '',
+            'content_type_2_id_obj': '',
+            'question_count': 0,
+            'difficulties_obj': [],
+
+            'test_method_id':'',
+            'test_method_name':'',
+
+            'solution_method_id':'',
+            'solution_method_name':'',
+
+            'feature_ids':[],
+            'currentRow':'',//题目（配置结构-新）标记特征的当前行
+            // 'related_catalog':{}//关联section
+        };
+        //题目（AI试题集）
+        var ai_set_map = {
+            'scene_type_obj':''
+        } 
+        //题目（配置ID）模型
+        var question_id_map = {
+            'type': 5,
+            'question_id': '',
+            'questions': [],
+            'question_ids': [],
+            'book_of_question': '',
+            'question_ids_from_book': [],
+            'related_catalog':[]
+        }
+        self.question_ai_obj_arr = ko.observableArray([]);//存放模型数组
+        //测验（配置ID）模型
+        var quiz_id_map = {
+            'type': 6,
+            'paper_id': '',
+            'papers': [],
+            'paper_ids': []
+        }
+        //题目(配置题集)模型
+        var question_set_map = {
+            'type': 7,
+            'name': '',
+            'difficulties_obj': '',
+            'question_id': '',
+            'alternative': false,
+            'usage_type_obj': ''
+        }
+        //单词模型
+        var word_map = {
+            'type': 8,
+            'word_ids': [],
+            'words': [],
+            'content_type_2_ids': [],
+            'content_type_2_names' : [],
+            'word_select_list': [],
+            'word_input': '',
+            'word_selected_id': '',
+            'book_of_word': '',  //批量添加单词时的教材id
+            'single': "0"// 是否随机题型
+        }
+        //绘本模型
+        var picture_book_map = {
+            'type': 10,
+            'id': '',
+            'description': '',
+            'picture_book_ids': [],
+            'picture_books': [],
+            'pb_input': ''
+        }
+
+        // 配置视频
+        var video_config_map = {
+            'type': 12,
+            'video_id': '',
+            'name': '',
+            'question_ids': [],
+            'questions': [],
+            'question_ids_add': []
+        };
+        var video_config_add_map = {
+            'video_id': '',
+            'name': '',
+        };
+        self.videoConfig = ko.mapping.fromJS(video_config_map);
+        self.videoConfigAdd = ko.mapping.fromJS(video_config_add_map);
+        self.videoConfigs = ko.observableArray([]);
+        self.addVideoConfig = function() {
+            if (!(self.videoConfigAdd.video_id() && self.videoConfigAdd.name())) {
+                $tools.msgTip('视频名称和ID不能为空');
+                return;
+            }
+            // 检查是否是已有的vid
+            var videoConfigsRaw = ko.mapping.toJS(self.videoConfigs);
+            if ($.inArray(self.videoConfigAdd.video_id(), videoConfigsRaw.map(function(item) {return item.video_id;})) >= 0) {
+                $tools.msgTip('视频ID:' + self.videoConfigAdd.video_id() + '已经存在');
+                return;
+            }
+            self.videoConfigs.push(ko.mapping.fromJS({
+                'type': 12,
+                'video_id': self.videoConfigAdd.video_id(),
+                'name': self.videoConfigAdd.name(),
+                'question_ids': [],
+                'questions': [],
+                'question_ids_add': []
+            }));
+            self.videoConfigAdd.video_id('');
+            self.videoConfigAdd.name('');
+
+            var index = self.videoConfigs().length - 1;
+            self.getQidsByVideo(index);
+        };
+        self.getQidsByVideo = function(index) {
+            var videoConfig = self.videoConfigs()[index];
+            $tools.ajax({
+                url: '/video/edit',
+                type: 'GET',
+                data: {
+                    subject_id: self.objective_config.subject_id(),
+                    video_id: videoConfig.video_id()
+                },
+                success: function(returnData) {
+                    if (returnData.data.status == 'ONLINE') {
+                        videoConfig.question_ids_add(returnData.data.practice_questions);
+                        self.addVideoQuestions(index);
+                    } else {
+                        $tools.msgTip('不能添加未上线视频');
+                        self.videoConfigs.splice(index, 1);
+                    }
+
+                },
+                error: function() {
+                    self.videoConfigs.splice(index, 1);
+                }
+            });
+        };
+        self.deleteVideoConfig = function(index) {
+            if (!confirm('确认删除')) return;
+            self.videoConfigs.splice(index,1);
+        };
+        self.addVideoQuestions = function(index) {
+            console.log('addVideoQuestions');
+            var tt = self.videoConfigs()[index];
+            var len = tt.question_ids().length;
+            var addedQuestionIds = exclude(unique(tt.question_ids_add()), tt.question_ids());
+
+            for (var index = 0; index < addedQuestionIds.length; index++) {
+                tt.question_ids.splice(len+index, 0, addedQuestionIds[index]);
+            }
+
+            $tools.ajax({
+                url: '/teaching-objective/doc-info',
+                data: {
+                    doc_ids: tt.question_ids(),
+                    content_type_id: tt.type,
+                    objective_config_id: self.objective_config._id(),
+                    content_id: tt.id ? tt.id() : '',
+                    teaching_objective_id: self.data.itemId
+                },
+                showLoadingMask: false,
+                success: function(data){
+                    tt.questions.removeAll();
+                    for (var ii = 0; ii < data.rs.length; ii++) {
+                        tt.questions.splice(ii, 0, ko.mapping.fromJS(data.rs[ii]));
+                    }
+                    tt.question_ids(data.rs.map(function(item) {return item.question_id;}))
+
+                    // clear data.
+                    tt.question_ids_add([]);
+                    self.videoConfigAdd.video_id('');
+                    self.videoConfigAdd.name('');
+                }
+            });
+
+        };
+        self.deleteVideoQuestion = function(data, index) {
+            if (!confirm('确认删除')) return;
+            console.log('deleteVideoQuestion');
+            data.questions.splice(index, 1);
+            data.question_ids.splice(index, 1);
+        };
+        self.initVideoConfigs = function() {
+            self.videoConfigs([]);
+            self.videoConfigAdd.video_id('');
+            self.videoConfigAdd.name('');
+        };
+        // 配置视频 end
+
+        //配置包模型
+        var objectiveConfigMap = {
+            "_id": "",
+            "name": "",   //作业形式
+            "custom_name": "", //名称
+            "objective_id": "",    // 教学目标id
+            "contents" : [],
+            "created_at": '',
+            "updated_at": '',
+            "deleted_at": '',
+            "description": '',
+            "extras": {'start_at': '', 'end_at': ''},
+            "config_type": '',
+            "subject_id": '102'
+        }
+
+        //朗读背诵
+        var read_and_recite_map = {
+            "type": 13,
+            "id": "OC_1_13_1",
+            "question_id":'',
+            "questions":[],
+            "question_add": '',
+            "book_of_question":'',
+            "question_ids":[], // 录题环境题目id
+            "lesson": "",   // 课文名
+            "dynasty": "",  // 朝代
+            "author": "",   // 作者
+        }
+
+
+
+        //基础应用（Lesson配置应用类型）
+        var base_application={
+            'rows':[],//最后提交这个对象中数据
+
+            'current_index':-1, //定义索引
+            'current_node':[],
+
+            'category_types':[],//弹框下拉列表
+            'tags':[],    //弹框下拉列表选中项
+
+            'all_choose':false //弹框全反选
+        }
+
+        self.base_application_obj = ko.mapping.fromJS(base_application);
+
+        //加载弹框
+        self.addTypeCasten=ko.observable({
+            name: self.parent.data.mapping.getTmpl('add_type'),//template绑定
+            data: {
+                pageData: self
+            }
+        });
+
+        BatchPlugin.register(self);
+
+        //触发弹窗
+        self.addType=function () {
+            self.base_application_obj.current_index = self.base_application_obj.rows.indexOf(this);//核心点。取得当前按钮所在作用域，在所在表格的索引
+            self.base_application_obj.current_node(this.selectedTags());
+            $("#addTypeCasten").modal('toggle');//弹框
+        }
+
+        //弹框全反选定
+        self.base_application_obj.all_choose=ko.pureComputed({
+            read:function () {
+                if(self.base_application_obj.tags()){
+                    //["10310,单词跟读", "10321,跟读训练", "10306,单词拼写", "10307,单词排序", "10314,看图识词", "10311,单词辨识"]
+                    var newIdsArr=[],newVal=self.base_application_obj.current_node();
+                    for(var j=0;j<newVal.length;j++){
+                        var  currentNodeId= parseInt(newVal[j].slice(0,newVal[j].indexOf(',')));
+                        newIdsArr.push(currentNodeId);
+                    }
+
+                    //self.tags()[1]的格式[[1123,'aaaa'],[131,'sddddds'],[1081,'wwww']]
+                    var temp=0;
+                    for(var i=0,check_list=self.base_application_obj.tags()[1];i<check_list.length;i++){
+                        var id=check_list[i][0];//取得ID
+                        if(newIdsArr.indexOf(id)<0){
+                            temp++;
+                            return false;
+                        }
+                    }
+                    if(temp==0){
+                        return true;
+                    }
+                }
+            },
+            write:function (newVal) {
+                 if(self.base_application_obj.tags()) {
+                     //全选
+                     if (newVal) {
+                         var arr = [], stringIdName = '';
+                         for (var i = 0,app_obj=self.base_application_obj; i < app_obj.tags()[1].length; i++) {
+                             var id = app_obj.tags()[1][i][0],
+                                 name = app_obj.tags()[1][i][1];
+                                 stringIdName = id + ',' + name;
+                             //页面加载含有此选项，则不添加
+                             if (app_obj.current_node().indexOf(stringIdName) < 0) {
+                                 //不包含则添加进去
+                                 app_obj.current_node.push(stringIdName);//追加
+                             }
+                         }
+                     }
+                     //反选
+                     else {
+                         //循环currentNode，删除self.tags()[1]的项
+                         for (var i = 0,app_obj=self.base_application_obj; i < app_obj.tags()[1].length; i++) {
+                             var id = app_obj.tags()[1][i][0];//只比较id
+                             for (var j = 0,current_node=self.base_application_obj.current_node(); j < current_node.length; j++) {
+                                 var currentNodeId = parseInt(current_node[j].slice(0, current_node[j].indexOf(',')));
+                                 if (id == currentNodeId) {
+                                     //删除此项
+                                     var index = current_node.indexOf(current_node[j]);
+                                     self.base_application_obj.current_node.splice(index, 1);
+                                 }
+                             }
+                         }
+                     }
+                 }
+                },
+            owner:this
+        })
+
+        //弹框确认
+        self.confirm=function () {
+            var index=self.base_application_obj.current_index,
+                currentNode= self.base_application_obj.current_node();
+            self.base_application_obj.rows()[index].selectedTags(currentNode);//弹框确定的时候，为主页面对应索引的作用域赋值tags
+            $("#addTypeCasten").modal('toggle');//隐藏弹框
+        }
+
+        function unique(arr) {
+            var result = [], hash = {};
+            for (var i = 0, elem; (elem = arr[i]) != null; i++) {
+                if (!hash[elem]) {
+                    result.push(elem);
+                    hash[elem] = true;
+                }
+            }
+            return result;
+        }
+
+        function exclude(arr, excludedArr) {
+            if (!excludedArr || excludedArr.length == 0) return arr;
+            return arr.filter(function(item) { return $.inArray(item, excludedArr) == -1});
+        }
+
+        //去掉提交数据中的空格
+        var trimString = function(target){
+            if($.isArray(target)){
+                for(var i=0,l=target.length; i<l; i++){
+                    target[i] = $.trim(target[i]);
+                }
+            }
+            else{
+                return $.trim(target);
+            }
+            return unique(target);
+        }
+
+        //过滤数组中的空串
+        var filterArray = function(arr){
+            var result = [];
+            for(var i=0,l=arr.length; i<l; i++){
+                if(arr[i]){
+                    result.push(arr[i]);
+                }
+            }
+            return result;
+        }
+        //创建特征参数对象
+        var createObj = function(idSelector,childUrl,allUrl) {
+            return {
+                selector: idSelector,
+                rootEnable: true,
+                subject:self.objective_config.subject_id(),
+                maxTags: 1,
+                childUrl: childUrl?childUrl:'#',
+                allUrl: allUrl?allUrl:'/knowledge-point-feature/search-nodes'
+            };
+        }
+        
+        //选中的特征值id
+        self.featurePoint=ko.observable();
+        
+        //当前选中的配置包类型
+        self.currentType = ko.observable(); 
+        
+        //用于绑定到页面的对象
+        self.question_construct_obj = ko.mapping.fromJS(question_construct_map);
+        self.question_construct_obj_arr = ko.observableArray([]);//綁定到頁面的對象數組
+        
+        //新
+        self.question_construct_obj_new = ko.mapping.fromJS(question_construct_map_new);
+
+        self.question_set_obj = ko.mapping.fromJS(question_set_map);
+        self.question_ai_obj = ko.mapping.fromJS(ai_set_map);
+        self.question_id_obj = ko.mapping.fromJS(question_id_map);
+        self.question_id_obj_arr = ko.observableArray([]);//type=5 改造数组
+
+        self.read_and_recite = ko.mapping.fromJS(read_and_recite_map); // 编辑框
+        self.read_and_recite_set = ko.observableArray([]);
+
+        self.quiz_id_obj = ko.mapping.fromJS(quiz_id_map);
+        self.picture_book_obj = ko.mapping.fromJS(picture_book_map);
+
+        //标记特征
+        self.triggerMarkFeature=function($index){
+            if (this.kp_name()=="") {alert("只有对非空知识点标记特征");return}
+            self.question_construct_obj_new.currentRow(this);
+            $("#markFeature + .bootstrap-tagsinput").children().trigger('click');
+        }
+
+        self.word_obj = ko.mapping.fromJS(word_map);
+
+        // self.question_id_obj.questions.subscribe(function(newValue){
+        //     self.question_id_obj.question_ids.removeAll();
+        //     ko.utils.arrayForEach(self.question_id_obj.questions(), function(item){
+        //         self.question_id_obj.question_ids.push(item.question_id());
+        //     });
+        // });
+
+        self.quiz_id_obj.papers.subscribe(function(newValue){
+            self.quiz_id_obj.paper_ids.removeAll();
+            ko.utils.arrayForEach(self.quiz_id_obj.papers(), function(item){
+                self.quiz_id_obj.paper_ids.push(item.paper_id());
+            });
+        });
+
+        //监听绘本的数组变动
+        self.picture_book_obj.picture_books.subscribe(function(newValue){
+            self.picture_book_obj.picture_book_ids.removeAll();
+            ko.utils.arrayForEach(self.picture_book_obj.picture_books(), function(pb){
+                self.picture_book_obj.picture_book_ids.push(pb._id());
+            });
+        });
+
+        //监听特征变化，订阅运行两遍，不知原因，还需要做处理  
+        //估计是封装的时候，TreeView将这 self.featurePoint赋值了两遍 items 第一遍为[],第二遍有数据,通过items.length做一下限制
+        self.featurePoint.subscribe(function(newVal){
+            var items=$('#markFeature').tagsinput('items');
+            if (items.length) {
+                var has = self.question_construct_obj_new.currentRow().features().some(function(item) {return item.id() == items[0].id;});
+                if(!has){
+                    self.question_construct_obj_new.currentRow().features.push(ko.mapping.fromJS({id:items[0].id,name:items[0].text}));
+                    self.question_construct_obj_new.currentRow().feature_ids.push(items[0].id);
+                }
+            }
+        })
+
+        //列表数据
+        //题目（配置结构）table模型
+        self.question_constructs = ko.observableArray([]);
+        self.question_constructs_arr = ko.observableArray([]);//分组后的table
+        //题目（配置结构-新）table模型
+        self.question_constructs_new = ko.observableArray([]);
+        //AI试题集 table模型
+        self.question_ai = ko.observable({
+            id:ko.observable(''),
+            type:ko.observable(''),
+            scene_ids:ko.observableArray([])
+        });
+        self.question_sets = ko.observableArray([]);
+        self.word_sets = ko.observableArray([]);
+
+        //####################界面操作函数##########################################
+
+        //添加题目（配置结构）
+        self.addQuestionAi = function(){
+            var obj = ko.mapping.toJS(self.question_ai_obj);
+            //去重处理
+            var add = true;
+            self.question_ai().scene_ids().forEach(function(ele,index,arr){
+                if(ele[0]==obj.scene_type_obj.split('-')[0]){
+                    $tools.msgTip("不可重复添加");
+                    add = false;
+                }
+            });
+            if(add){
+                self.question_ai().scene_ids.push([
+                    obj.scene_type_obj.split('-')[0],
+                    obj.scene_type_obj.split('-')[1]
+                ]);
+            }
+        }
+        self.addQuestionConstruct = function(index){
+
+             // debugger;
+            self.question_construct_obj=self.question_construct_obj_arr()[index];
+
+            if(self.question_construct_obj.kp_id_obj()=='')return;
+            var obj = ko.mapping.toJS(self.question_construct_obj);
+
+            //处理题型
+            obj.content_type_id = self.question_construct_obj.content_type_id_obj().id;
+            obj.content_type_name = ko.observable(self.question_construct_obj.content_type_id_obj().name);
+
+
+            obj.content_type_2_id = self.question_construct_obj.content_type_2_id_obj().id;
+            obj.content_type_2_name = ko.observable(self.question_construct_obj.content_type_2_id_obj().name);
+            //处理关联secton
+            // debugger;
+            var selectedItem;
+           
+            obj.related_catalog = ko.observableArray([]);
+
+            $('.sec1').each(function(i){
+                if(i==index){
+                    var item = $(this).tagsinput('items');
+                    if(item.length){
+                        obj.related_catalog.push({section_id:item[0].id,section_name:item[0].text})
+                    }else{
+                        obj.related_catalog.push({section_id:'',section_name:''})
+                    }
+                    //还原
+                $(this).tagsinput('removeAll');
+                }
+            });
+            //处理难度
+            // debugger;
+            obj.difficulties = [];
+            obj.difficulty_names = [];
+            for(var i=0,l=self.question_construct_obj.difficulties_obj().length; i<l; i++){
+                var temp = self.question_construct_obj.difficulties_obj()[i].split('-');
+                obj.difficulties.push(temp[0]);
+                obj.difficulty_names.push(temp[1]);
+            }
+
+            //处理知识点
+            obj.kp_id =  self.question_construct_obj.kp_id_obj();
+            //仅实现在页面显示知识点名字  
+            // debugger;  
+            var klg_items=$('.klg-1').tagsinput('items');
+            if(klg_items.length){
+                //多情況
+                //obj.kp_name =  klg_items[index][0].text;
+                if(typeof klg_items[index][0]!= 'undefined'){
+                    obj.kp_name =  klg_items[index][0].text;
+                }else{
+                    obj.kp_name =  klg_items[0].text;
+                }
+            }
+
+            // self.question_constructs.push(obj);
+            self.question_constructs_arr()[index].push(obj);
+            //将输入对象还原
+            ko.mapping.fromJS(question_construct_map, self.question_construct_obj);
+            $('.kpselect').tagsinput('removeAll');//还原知识点
+
+        }
+        //添加题目（配置结构）新
+        self.addQuestionConstructNew = function(){
+            if(self.question_construct_obj_new.kp_id_obj()!=''||self.question_construct_obj_new.test_method_id()!=''||self.question_construct_obj_new.solution_method_id()!='')
+                {
+                    var obj = ko.mapping.toJS(self.question_construct_obj_new);
+
+                    //处理题型
+                    obj.content_type_id = self.question_construct_obj_new.content_type_id_obj().id;
+                    obj.content_type_name = ko.observable(self.question_construct_obj_new.content_type_id_obj().name);
+
+
+                    obj.content_type_2_id = self.question_construct_obj_new.content_type_2_id_obj().id;
+                    obj.content_type_2_name = ko.observable(self.question_construct_obj_new.content_type_2_id_obj().name);
+
+                    //处理难度
+                    obj.difficulties = [];
+                    obj.difficulty_names = [];
+                    for(var i=0,l=self.question_construct_obj_new.difficulties_obj().length; i<l; i++){
+                        var temp = self.question_construct_obj_new.difficulties_obj()[i].split('-');
+                        obj.difficulties.push(temp[0]);
+                        obj.difficulty_names.push(temp[1]);
+                    }
+
+                    //提交知识点id
+                    obj.kp_id =  self.question_construct_obj_new.kp_id_obj();
+                    //仅实现在页面显示知识点名字    
+                    var klg_items=$('.klg').tagsinput('items');
+                    console.log(klg_items);
+                    if(klg_items.length){
+                        obj.kp_name =  ko.observable(klg_items[0].text);
+                    }
+                    else{
+                         obj.kp_name=ko.observable("");//此处控制仅选择考法或者解法时,obj.kp_name没有值，页面报错，手动赋值为""
+                    }
+
+                    //提交考法id
+                    obj.test_method_id =  self.question_construct_obj_new.test_method_id();
+                    //仅实现在页面显示考法名字    
+                    var test_items=$('.test-method-select').tagsinput('items');
+                    if(test_items.length) obj.test_method_name =  test_items[0].text;
+                   
+                    //提交解法id
+                    obj.solution_method_id =  self.question_construct_obj_new.solution_method_id();
+                    //仅实现在页面显示解法名字    
+                    var solution_items=$('.solution-method-select').tagsinput('items');
+                    if(solution_items.length) obj.solution_method_name =  solution_items[0].text;
+                    
+
+                    //处理当前行的特征值数组,只需要features 就包含id name了，不需要对feature_ids做处理
+                    //错误的做法是：将一个ko变量（方法名）直接赋值给一个js变量，是容易出现问题的。例如：obj.features=self.question_construct_obj_new.features
+                    //正确的做法是：应该将ko对象转化成js对象，然后再转化成ko对象。  ko->js->ko
+                    //obj.features =  ko.mapping.fromJS(self.question_construct_obj_new.features());
+                    obj.features = ko.observableArray([]);
+
+                    self.question_constructs_new.push(obj);
+                    //将输入对象还原 
+                    ko.mapping.fromJS(question_construct_map_new, self.question_construct_obj_new);
+                    //清空页面上次操作留下的选择项（知识点、考法、解法）
+                    $('.kpselect,.solution-method-select,.test-method-select').tagsinput('removeAll');
+                }
+            else{
+                $tools.msgTip("知识点、考法和解法至少要有一个");
+                return;
+            }
+        }
+
+        //添加题目（配置题集）
+        self.addQuestionSet = function(){
+            // debugger;
+            var obj = ko.mapping.toJS(self.question_set_obj);
+            if(obj.name=='' || obj.difficulties_obj=='')return;
+
+            //处理难度
+            var temp = obj.difficulties_obj.split('-');
+            obj.difficulty = temp[0];
+            obj.difficulty_name = temp[1];
+
+            //处理类型
+            obj.usage_type = obj.usage_type_obj[0];
+            obj.usage_type_name = obj.usage_type_obj[1];
+            //处理关联section
+            var selectedItem = $('.sec3').tagsinput('items')[0];
+            if(selectedItem){
+                obj.related_catalog = ko.observable([{
+                    section_id:ko.observable($('.sec3').tagsinput('items')[0].id),
+                    section_name:ko.observable($('.sec3').tagsinput('items')[0].text)
+                }]);
+            }else{
+                 obj.related_catalog = ko.observable([{
+                    section_id:ko.observable(''),
+                    section_name:ko.observable('')
+                }]);
+            }
+
+            //处理试题
+            obj.questions = ko.observableArray([]);
+            obj.question_ids = ko.observableArray([]);
+            obj.questions.subscribe(function(newValue){
+                obj.question_ids.removeAll();
+                for(var i=0,l=newValue.length; i<l; i++){
+                    obj.question_ids.push(newValue[i].question_id());
+                }
+            });
+            obj.question_id = ko.observable('');
+
+            self.question_sets.push(obj);
+            $('.sec3').tagsinput('removeAll');//还原关联节点
+            //将对象还原
+            ko.mapping.fromJS(question_set_map, self.question_set_obj);
+        }
+        //向题集中添加试题
+        self.addQuestionToSet = function(){
+             // debugger;
+            var _this = this;
+            var question_ids = this.question_id().split('\n');
+            question_ids = filterArray(trimString(question_ids));
+
+            //过滤数组中的重复id
+            var resultArray = [];
+            if(_this.questions().length){
+                ko.utils.arrayForEach(question_ids, function(id){
+                    var idInArray = false;
+                    ko.utils.arrayForEach(_this.questions(), function(q){
+                        if(id == q.question_id()){
+                            idInArray = true;
+                            return;
+                        }
+                    });
+                    if(!idInArray){
+                        resultArray.push(id);
+                    }
+                });
+            }
+            else{
+                resultArray = question_ids;
+            }
+
+            if(resultArray.length==0){
+                _this.question_id('');
+                return;
+            }
+
+            //把原有的数组也加进去
+            if(_this.question_ids && _this.question_ids().length){
+                resultArray = resultArray.concat(_this.question_ids());
+            }
+
+            $tools.ajax({
+                url: '/teaching-objective/doc-info',
+                data: {doc_ids: resultArray, content_type_id: this.type, objective_config_id: self.objective_config._id(), content_id: _this.id ? _this.id() : '', teaching_objective_id: self.data.itemId},
+                showLoadingMask: false,
+                success: function(data){
+                    _this.questions.removeAll();
+                    for(var i=0,l=data.rs.length; i<l; i++){
+                        _this.questions.push(ko.mapping.fromJS(data.rs[i]));
+                    }
+                    _this.question_id('');
+                }
+            });
+        }
+        //移动试题
+        self.moveItem = function(index, direc, questions){
+            var tmp = questions.splice(index, 1);
+            var pos = direc == 1 ? index-1 : index+1;
+            questions.splice(pos, 0, tmp[0]);
+        }
+
+        //添加试题（配置ID）
+        self.addQuestionToIds = function(index){
+             // debugger;
+            console.log(this);
+            ko.mapping.fromJS(ko.mapping.toJS(self.question_id_obj_arr()[index]), self.question_id_obj);
+            var _this = self.question_id_obj;
+
+            //obj是当前操作的对象
+            var obj = ko.mapping.toJS(self.question_id_obj);
+            var resultArray = [];
+            var submitArray = [];
+
+            if(!obj.question_id){
+                if(obj.question_ids_from_book.length==0){
+                    return;
+                }
+                else{
+                    //如果有从教材中批量加进来的试题，也加入
+                    console.log(obj.question_ids_from_book);
+                    if(obj.question_ids_from_book.length){
+                        resultArray = resultArray.concat(obj.question_ids_from_book);
+                    }
+                }
+            }
+           else{
+                var ids = obj.question_id.split('\n');
+                ids = filterArray(trimString(ids));
+                //过滤数组中的重复id
+                if(_this.questions().length){
+                    ko.utils.arrayForEach(ids, function(id){
+                        var idInArray = false;
+                        ko.utils.arrayForEach(_this.questions(), function(q){
+                            if(id == q.question_id()){
+                                idInArray = true;
+                                return;
+                            }
+                        });
+                        if(!idInArray){
+                            resultArray.push(id);
+                        }
+                    });
+                }
+                else{
+                    resultArray = ids;
+                }
+
+            }
+            //把原有的数组也加进去
+            if(_this.question_ids && _this.question_ids().length){
+                submitArray = _this.question_ids().concat(resultArray);
+            }
+            else{
+                submitArray = resultArray;
+            }
+            // debugger;
+            console.log(submitArray);
+            if(_this.question_ids().length==0){
+                self.question_id_obj_arr()[index].question_ids.push(submitArray[0]);
+            }else{
+                self.question_id_obj_arr()[index].question_ids(submitArray);
+            }
+            if(submitArray.length==0){
+                self.question_id_obj_arr()[index].question_id('');
+                return;
+            }
+
+            $tools.ajax({
+                url: '/teaching-objective/doc-info',
+                data: {doc_ids: submitArray, content_type_id: _this.type, objective_config_id: self.objective_config._id(), content_id: _this.id ? _this.id() : '', teaching_objective_id: self.data.itemId},
+                showLoadingMask: false,
+                success: function(data){
+                    //_this.questions.removeAll();
+                    //_this.questions.removeAll();
+                    self.question_id_obj_arr()[index].questions.removeAll();
+                    // debugger;
+                    for(var i=0,l=data.rs.length; i<l; i++){
+                        //_this.questions.push(ko.mapping.fromJS(data.rs[i]));
+                        self.question_id_obj_arr()[index].questions.push(ko.mapping.fromJS(data.rs[i]));
+                    }
+                    //_this.question_id('');
+                    self.question_id_obj_arr()[index].question_id('');
+
+                }
+            });
+
+        }
+
+        self.addQuestionAll = function(obj, event){
+            $(event.target).nextAll('.bootstrap-tagsinput').find('input').trigger('click');
+
+        }
+
+        //试题排序
+        self.sortQuestion = function(idstr){
+            var ids = idstr().split('\n');
+            ids = filterArray(trimString(ids));
+            console.log(ids);
+            return $tools.ajax({
+                url: '/teaching-objective/sort-question',
+                data: {
+                    subject_id: self.objective_config.subject_id(),
+                    question_ids: ids
+                },
+                success: function(returnData){
+                    result = returnData.question_ids.join('\n');
+                    idstr(result);
+                }
+            });
+        }
+
+
+        //添加试卷  测验（配置ID）
+        self.addPaperToQuiz = function(){
+            var _this = this;
+            var obj = ko.mapping.toJS(self.quiz_id_obj);
+
+            if(!obj.paper_id)return;
+
+            var ids = obj.paper_id.split('\n');
+            ids = filterArray(trimString(ids));
+
+            //过滤数组中的重复id
+            var resultArray = [];
+            if(_this.papers().length){
+                ko.utils.arrayForEach(ids, function(id){
+                    var idInArray = false;
+                    ko.utils.arrayForEach(_this.papers(), function(p){
+                        if(id == p.paper_id()){
+                            idInArray = true;
+                            return;
+                        }
+                    });
+                    if(!idInArray){
+                        resultArray.push(id);
+                    }
+                });
+            }
+            else{
+                resultArray = ids;
+            }
+
+            if(resultArray.length==0){
+                _this.paper_id('');
+                return;
+            }
+            $tools.ajax({
+                url: '/teaching-objective/doc-info',
+                data: {doc_ids: resultArray, content_type_id: this.type, objective_config_id: self.objective_config._id(), teaching_objective_id: self.data.itemId},
+                showLoadingMask: false,
+                success: function(data){
+                    for(var i=0,l=data.rs.length; i<l; i++){
+                        _this.papers.push(ko.mapping.fromJS(data.rs[i]));
+                    }
+                    _this.paper_id('');
+                }
+            });
+        }
+
+        //搜索单词
+        self.searchWord = function(callback){
+            var input = self.word_obj.word_input();
+
+            if(input.indexOf(')')>=0)return;
+            if(self.searchWordTimmer){
+                clearTimeout(self.searchWordTimmer);
+                self.searchWordTimmer = null;
+            }
+            if(self.searchWordAjax){
+                self.searchWordAjax.abort();
+                self.searchWordAjax = null;
+            }
+            self.searchWordTimmer = setTimeout(function(){
+                self.searchWordAjax = $.ajax({
+                    url: '/teaching-objective/word-hints',
+                    type: 'POST',
+                    data: {
+                        word: input,
+                        book_node_id: self.word_obj.book_of_word()
+                    },
+                    success: function(data){
+                        if(data.success){
+                            self.word_obj.word_select_list.removeAll();
+                            ko.utils.arrayForEach(data.hints, function(item){
+                                self.word_obj.word_select_list.push({id: item.id, name: item.name});
+                                if(self.word_obj.word_input() == item.name){
+                                    self.word_obj.word_selected_id(item.id);
+                                }
+                            });
+                            self.searchWordAjax = null;
+                            typeof callback == 'function' && callback();
+                        }
+                        else{
+                            $tools.msgTip(data.error);
+                        }
+                    }
+                });
+            });
+        }
+        //添加单词
+        self.addWord = function(){
+            ko.utils.arrayForEach(self.word_obj.word_select_list(), function(item){
+                if(item.name == self.word_obj.word_input()){
+                    self.word_obj.word_selected_id(item.id);
+                }
+            });
+            if(!self.word_obj.word_selected_id())return;
+            self.word_obj.words.push({
+                id: self.word_obj.word_selected_id(),
+                name: self.word_obj.word_input(),
+            });
+
+            self.word_obj.word_ids.push(self.word_obj.word_selected_id());
+            self.word_obj.word_input('');
+
+        }
+        //批量添加本单元单词
+        self.addWordAll = function(obj, event){
+            self.word_obj.words.removeAll();
+            self.word_obj.word_ids.removeAll();
+            self.word_obj.word_select_list.removeAll();
+            self.word_obj.word_input('');
+
+            $(event.target).nextAll('.bootstrap-tagsinput').find('input').trigger('click');
+
+        }
+
+        //添加单词集合
+        self.addWordSets = function(){
+
+            var obj = ko.mapping.toJS(self.word_obj);
+            if(obj.words.length === 0){
+                alert("单词不能为空");
+                return;
+            }
+            var splits,ele;
+            for(var i= 0,l=obj.content_type_2_ids.length; i<l; i++){
+                ele = obj.content_type_2_ids[i];
+                splits =  ele.split("-");
+                obj.content_type_2_ids[i] = splits[0];
+                obj.content_type_2_names.push(splits[1]);
+            }
+
+            self.word_sets.push(ko.mapping.fromJS(obj));
+            //将对象还原
+            ko.mapping.fromJS(word_map, self.word_obj);
+        }
+
+        //删除单词集合
+        self.removeWordSet = function(){
+            self.word_sets.remove(this);
+        }
+
+        //添加绘本id
+        self.addPictureBook = function(){
+            var pb_ids = self.picture_book_obj.pb_input().split('\n');
+            pb_ids = filterArray(trimString(pb_ids));
+
+            //过滤数组中的重复id
+            var resultArray = [];
+            if(self.picture_book_obj.picture_book_ids().length){
+                ko.utils.arrayForEach(pb_ids, function(id){
+                    var idInArray = false;
+                    ko.utils.arrayForEach(self.picture_book_obj.picture_book_ids(), function(q){
+                        if(id == q){
+                            idInArray = true;
+                            return;
+                        }
+                    });
+                    if(!idInArray){
+                        resultArray.push(id);
+                    }
+                });
+            }
+            else{
+                resultArray = pb_ids;
+            }
+
+            if(resultArray.length==0){
+                self.picture_book_obj.pb_input('');
+                return;
+            }
+
+            $tools.ajax({
+                url: '/teaching-objective/doc-info',
+                data: {doc_ids: resultArray, content_type_id: self.picture_book_obj.type(), objective_config_id: self.objective_config._id(), content_id: self.picture_book_obj.id(), teaching_objective_id: self.data.itemId},
+                showLoadingMask: false,
+                success: function(data){
+                    for(var i=0,l=data.rs.length; i<l; i++){
+                        self.picture_book_obj.picture_books.push(ko.mapping.fromJS(data.rs[i]));
+                    }
+                    self.picture_book_obj.pb_input('');
+                }
+            });
+        }
+
+        /**
+         *
+         * @param append   是否追加的
+         */
+        self.addReadAndRecite = function(append,index){
+            if(append){
+                 var _this = self.read_and_recite_set()[index];
+                 var ids = _this.question_add().split('\n');
+
+            }else{
+                var _this = self.read_and_recite;
+                if(!_this.lesson()){
+                    $tools.msgTip("课文名不能为空!");
+                    return;
+                }
+                var ids = _this.question_id().split('\n');
+                _this.question_id("");
+            }
+
+            var pdata= []; //去重后的数据
+
+            //过滤数组中的重复id
+            ko.utils.arrayForEach(ids, function(id){
+                var idInArray = false;
+                ko.utils.arrayForEach(_this.question_ids(), function(q){
+                    if(id == q){
+                        idInArray = true;
+                        return;
+                    }
+                });
+                if(!idInArray){
+                    _this.question_ids.push(id);
+                    pdata.push(id);
+                }
+            });
+            $tools.ajax({
+                url: '/teaching-objective/doc-info',
+                data: {
+                    doc_ids: pdata,
+                    content_type_id: _this.type,
+                    objective_config_id: self.objective_config._id(),
+                    content_id: _this.id ? _this.id() : '',
+                    teaching_objective_id: self.data.itemId
+                },
+                showLoadingMask: false,
+                success: function(data){
+                    for(var i=0;i<data.rs.length;i++){
+                       _this.questions.push(ko.mapping.fromJS(data.rs[i]));
+                    }
+
+                    if(!append){
+                        self.read_and_recite_set.push(ko.mapping.fromJS(ko.mapping.toJS(self.read_and_recite)));
+                        ko.mapping.fromJS(read_and_recite_map,self.read_and_recite);
+                    }else{
+                        _this.question_add("");
+                    }
+
+                    // console.log(data);
+                }
+            });
+
+        }
+
+        //####################界面操作函数结束##########################################
+
+
+        self.configs = ko.observable({});
+
+        self.objective_config = ko.mapping.fromJS(objectiveConfigMap);
+
+        self.parent_objective_id = ko.observable('');
+       
+        //提交配置包信息
+        self.submit = function(){
+            var contentsArray = [];
+            // debugger;
+            //题目（配置结构）
+            if(self.question_constructs_arr){
+                for(var i=0;i<self.question_constructs_arr().length;i++){
+                    contentsArray.push.apply(contentsArray, ko.mapping.toJS(self.question_constructs_arr()[i]()));
+                }
+            }
+            //题目（配置ID）
+            if(self.question_id_obj_arr().length){
+                for(var j=0;j<self.question_id_obj_arr().length;j++){
+                    if(self.question_id_obj_arr()[j].question_ids().length==0){
+                        self.question_id_obj_arr.splice(j,1);
+                    }
+                }
+                contentsArray.push.apply(contentsArray, ko.mapping.toJS(self.question_id_obj_arr));
+            }
+            //新题目配置结构
+            contentsArray.push.apply(contentsArray, ko.mapping.toJS(self.question_constructs_new));
+
+            contentsArray.push.apply(contentsArray, ko.mapping.toJS(self.question_sets));
+            contentsArray.push.apply(contentsArray, ko.mapping.toJS(self.word_sets));
+           
+            if(self.quiz_id_obj.papers().length){
+                contentsArray.push(ko.mapping.toJS(self.quiz_id_obj));
+            }
+            if(self.picture_book_obj.picture_book_ids().length){
+                contentsArray.push(ko.mapping.toJS(self.picture_book_obj));
+            }
+
+            //朗读背诵
+            if(self.read_and_recite_set().length){
+                [].push.apply(contentsArray,ko.mapping.toJS(self.read_and_recite_set));
+            }
+
+            //配置包的作业形式：由“基础应用”切换至其余下拉选项时，需要清空“基础应用”的数据
+            if(self.currentType().config_type==17){
+                //提交 组装数据 往contentsArray里面push多个行，每行又对应多个数组
+                for(var i=0,rows=self.base_application_obj.rows();i<rows.length;i++){
+                    var category_ids=[];
+
+                    for(var j=0;j<rows[i].selectedTags().length;j++){
+                        var temp=rows[i].selectedTags()[j]
+                        category_ids.push(temp.slice(0,temp.indexOf(',')))
+                    }
+                    if(category_ids.length){
+                        contentsArray.push({
+                             type: 9,
+                             lesson_id:rows[i].id,
+                             category_ids:category_ids
+                        })
+                    }
+                }
+            }
+
+            //contentsArray.push(ko.mapping.toJS(self.picture_book_obj));
+
+            // 视频配置
+            var videoConfigs = ko.mapping.toJS(self.videoConfigs);
+            for (var i = 0; i < videoConfigs.length; i++) {
+                contentsArray.push(videoConfigs[i]);
+            }
+
+            var objectiveConfigObj = ko.mapping.toJS(self.objective_config);
+            objectiveConfigObj.contents = contentsArray;
+            //AI题集
+            //if(self.currentType().config_type==2){
+            if(self.question_ai().scene_ids().length){
+                 var item = [{
+                    type:'15',
+                    id:'',
+                    scene_ids:[]
+                }]
+                var ai = ko.mapping.toJS(self.question_ai);
+                for(var i=0;i<ai.scene_ids.length;i++){
+                    item[0].scene_ids.push(ai.scene_ids[i][0]);
+                }
+                contentsArray.push.apply(contentsArray, item);
+            }
+            console.log(contentsArray);
+            $tools.ajax({
+                url: '/teaching-objective/edit-objective-config',
+                data: {objective_config: JSON.stringify(objectiveConfigObj), subject_id: self.objective_config.subject_id()},
+                success: function(data){
+                    $tools.msgTip('操作成功', 'success');
+                    location.href = '#/edit_target/'+self.data.itemId+'/'+self.parent_objective_id();
+                }
+            });
+
+        }
+
+
+        $('body').off('edit_config_page_ready').on('edit_config_page_ready', function(){
+            
+            var targetId = self.data.itemId;
+            var configId = self.data.parentId;
+            var sdata = {
+                teaching_objective_id: targetId, objective_config_id: configId
+            }
+            var subject_id = UrlUtils.getUrlParams().subject_id;
+            sdata.subject_id = subject_id;
+
+            //获取初始数据
+            $tools.ajax({
+                url: '/teaching-objective/edit-objective-config',
+                type: 'GET',
+                data: sdata,
+                success: function(data){
+                    ko.mapping.fromJS(data.objective_config, self.objective_config);
+
+                    self.configs(data.configs);
+                    self.parent_objective_id(data.parent_objective_id);
+                    self.sectionInfor(data.section_list);
+                    //监听名称的变化，将name属性实时更新
+                    self.currentType.subscribe(function(newValue){
+                        self.objective_config.name(newValue.name);
+                        self.objective_config.config_type(newValue.config_type);
+                        //1，初始化rows，并为弹框下拉列表赋值
+                        if(newValue.content_configs[0].type==9){
+                            //self.base_application_obj.rows([]);
+                             for(var i=0,lessons=newValue.content_configs[0].lessons;i<lessons.length;i++){
+                                var id=lessons[i][0],
+                                    name=lessons[i][1],
+                                    chinesename=!!lessons[i][2]?lessons[i][2]:"";
+                                var row ={
+                                    id:id,
+                                    name:name,
+                                    chinesename:chinesename,
+                                    selectedTags:ko.observableArray([])
+                                };
+                                var ishas=self.base_application_obj.rows().some(function(item){
+                                    return item.id==row.id;
+                                })
+                                if (!ishas) {
+                                    self.base_application_obj.rows.push(row);
+                                }
+                                
+                             }
+                             var base_application=newValue.content_configs[0];
+                             self.base_application_obj.category_types(base_application.category_types);
+                        }
+
+
+                        //如果是中学，则保留原有数据，小学则清除
+                        if(self.objective_config.subject_id()<200){
+                            self.question_constructs_arr.removeAll();
+                            //self.question_constructs.removeAll();
+                            self.question_sets.removeAll();
+                            self.question_id_obj_arr.removeAll();
+                            // for(var i=0;i<self.question_id_obj_arr().length;i++){
+                            //     self.question_id_obj_arr()[i].questions.removeAll()
+                            // }
+                            self.quiz_id_obj.papers.removeAll();
+                            self.word_sets.removeAll();
+                        }
+
+                        // 清空视频
+                        self.initVideoConfigs();
+
+                        setTimeout(function(){
+                            var subject_id = self.objective_config.subject_id ? self.objective_config.subject_id() : '102';
+                            self.current_subject_id(subject_id);
+                            KnowledgePointSelectV2('.kpselect', subject_id);
+                            //考法
+                            KnowledgePointSelectV2(createObj('.test-method-select','/test-method/get-children','/test-method/get-all-test-methods'));
+                            //解法
+                            KnowledgePointSelectV2(createObj('.solution-method-select','/solution-method/get-children','/solution-method/get-all-solution-methods'));
+                            //标记特征的文本框
+                            KnowledgePointSelectV2(createObj('#markFeature'));
+                            //隐藏知识点tagsinput
+                            $('#markFeature + .bootstrap-tagsinput').css("display","none");
+
+                            BookTreeSelectV2('.book_tree_select', subject_id);
+                            $('.read-and-recite .bootstrap-tagsinput').css("display","none");
+                            BatchPlugin.linkSelectEvent(self);
+
+
+                             $('.section').each(function(i){
+                                $(this).tagsinput({
+                                    allowDuplicates:false,
+                                    itemValue:'id',
+                                    itemText:'text'
+                                });
+                                var _this = $(this);
+                                $(this).parent().children('.bootstrap-tagsinput').children('input').on('click',function(){
+                                    _this.trigger('click');
+                                });
+                            });
+                                
+
+                        });
+                    });
+
+                    //初始化currentType
+                    var type = data.objective_config.config_type;
+                    for(var i=0,l=data.configs.length; i<l; i++){
+                        if(data.configs[i].config_type == type){
+                            self.currentType(data.configs[i])
+                        }
+                    }
+
+                    //监听单词中的教材变化，如果变化，发起请求获取本教材单词
+                    self.word_obj.book_of_word.subscribe(function(newValue){
+                        if(newValue){
+                            self.searchWord(function(){
+                                ko.utils.arrayForEach(self.word_obj.word_select_list(), function(item){
+                                    self.word_obj.words.push(item);
+                                    self.word_obj.word_ids.push(item.id);
+                                });
+                            });
+                        }
+                    });
+
+                    //监听试题中的教材变化，如果变化，发起请求获取本教材单词
+                    for(var i=0;i<self.question_id_obj_arr().length;i++){
+                        self.question_id_obj_arr()[i].book_of_question.subscribe(function(newValue){
+                        if(newValue){
+                            $tools.ajax({
+                                url: '/teaching-objective/read-recite-qids',
+                                data: {book_node_id: newValue},
+                                success: function(returnData){
+                                    if(returnData.rs.length){
+                                        self.question_id_obj_arr()[i].question_ids_from_book(returnData.rs);
+                                        self.addQuestionToIds(i);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    }
+                    // self.question_id_obj.book_of_question.subscribe(function(newValue){
+                    //     if(newValue){
+                    //         $tools.ajax({
+                    //             url: '/teaching-objective/read-recite-qids',
+                    //             data: {book_node_id: newValue},
+                    //             success: function(returnData){
+                    //                 if(returnData.rs.length){
+                    //                     self.question_id_obj.question_ids_from_book(returnData.rs);
+                    //                     self.addQuestionToIds();
+                    //                 }
+                    //             }
+                    //         });
+                    //     }
+                    // });
+                     //监听试题中的教材变化，如果变化，发起请求获取本教材单词
+                    self.read_and_recite.book_of_question.subscribe(function(newValue){
+                        if(newValue){
+                            $tools.ajax({
+                                url: '/teaching-objective/read-recite-qids',
+                                data: {
+                                    book_node_id: newValue,
+                                    content_type: self.read_and_recite.type()
+                                },
+                                success: function(returnData){
+                                    if(returnData.rs.length){
+                                        self.read_and_recite.question_id(returnData.rs.join('\n'));
+                                        // self.addQuestionToIds();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    self.question_constructs_arr.removeAll();
+                    //self.question_constructs.removeAll();
+                    self.question_sets.removeAll();
+                    self.question_id_obj_arr.removeAll();
+                    // for(var i=0;i<self.question_id_obj_arr().length;i++){
+                    //     self.question_id_obj_arr()[i].questions.removeAll()
+                    // }
+                    //self.question_id_obj.questions.removeAll();
+                    self.quiz_id_obj.papers.removeAll();
+                    self.word_sets.removeAll();
+                    self.base_application_obj.rows.removeAll();
+                    var label = {
+                        check:false,
+                        id:'',
+                        name:''
+                    }
+                    for(var i=0; i<data.objective_config.contents.length; i++){
+                        var c = data.objective_config.contents[i];
+                        switch(c.type+''){
+                            case '1':
+                                //改造成數組
+                                var a = ko.mapping.fromJS(question_construct_map);
+                                a.related_catalog.push({section_id:ko.observable(''),section_name:ko.observable('')});
+                                self.question_construct_obj_arr.push(a);
+                                self.question_constructs_arr.push(ko.mapping.fromJS(c.list));
+                            break;
+                            case '5':
+                            // debugger;
+                                var ko_c = ko.mapping.fromJS(c);
+                                self.question_id_obj_arr.push(ko_c);
+
+                            break;
+                            case '6':
+                                ko.mapping.fromJS(c, self.quiz_id_obj);
+                            break;
+                            case '7':
+                                c.question_id = '';
+                                var ko_c = ko.mapping.fromJS(c);
+                                self.question_sets.push(ko_c);
+                                ko.utils.arrayForEach(self.question_sets(), function(item){
+                                    item.questions.subscribe(function(newValue){
+                                        item.question_ids.removeAll();
+                                        for(var j=0,l=newValue.length; j<l; j++){
+                                            item.question_ids.push(newValue[j].question_id());
+                                        }
+                                    });
+                                });
+                            break;
+                            case '8':
+                                self.word_sets.push(ko.mapping.fromJS(c));
+                            break;
+                            case '9':
+                                var base_application=self.currentType().content_configs[0];
+
+                                 //遍历所有课程，用来foreach
+                                for (var i=0;i<base_application.lessons.length;i++)
+                                {
+                                    var id=base_application.lessons[i][0],
+                                        name=base_application.lessons[i][1],
+                                        chinesename=!!base_application.lessons[i][2]?base_application.lessons[i][2]:"";
+                                    //页面首次加载，根据后台数据，初始化对应行的tags
+                                    var objArrName=[],objArrIds=[];
+                                    for(var j=0,real=data.objective_config.contents;j<real.length;j++){
+                                            //判断对应的tag放在对应的tr
+                                            if(real[j].lesson_id==id){
+                                                for(var k=0;k<real[j].category_names.length;k++){
+                                                    //为了下拉和循环 1,页面需要name  2,传值需要id  3,需要做到值传递 所以组装为字符串
+                                                    var stringIdTagData= real[j].category_names[k][0]+","+real[j].category_names[k][1];
+                                                    objArrName.push(stringIdTagData);
+                                                }
+                                            }
+                                    }
+
+                                    var row ={id:id,name:name,chinesename:chinesename,selectedTags:ko.observableArray(objArrName)};
+                                    self.base_application_obj.rows.push(row);
+                                }
+                                self.base_application_obj.category_types(base_application.category_types);
+                                break;
+                            case '10':
+                                ko.mapping.fromJS(c, self.picture_book_obj);
+                            break;
+                            case '11':
+                                self.question_constructs_new.push(ko.mapping.fromJS(c));
+                                //ko.mapping.fromJS(c, self.picture_book_obj);
+
+                            break;
+                            case "12":
+                                self.videoConfigs.push(ko.mapping.fromJS(
+                                    $.extend({'question_ids_add': ko.observable()}, c)
+                                ));
+                                break;
+                            case '13':
+                                self.read_and_recite_set.push(ko.mapping.fromJS($.extend({},read_and_recite_map,c)));
+                            break;
+                            case '15':
+                                self.question_ai(ko.mapping.fromJS(c));
+                            break;
+                        }
+                    }
+
+                    setTimeout(function(){
+
+                        KnowledgePointSelectV2('.kpselect', self.objective_config.subject_id());
+                        //考法
+                        KnowledgePointSelectV2(createObj('.test-method-select','/test-method/get-children','/test-method/get-all-test-methods'));
+                        //解法
+                        KnowledgePointSelectV2(createObj('.solution-method-select','/solution-method/get-children','/solution-method/get-all-solution-methods'));
+                        //标记特征的文本框
+                        KnowledgePointSelectV2(createObj('#markFeature'));
+                        //隐藏知识点tagsinput
+                        $('#markFeature + .bootstrap-tagsinput').css("display","none");
+                        BookTreeSelectV2('.book_tree_select', self.objective_config.subject_id());
+                        BatchPlugin.linkSelectEvent(self);
+                            $('.sec2').each(function(i){
+                                var id = self.question_id_obj_arr()[i].related_catalog()[0].section_id()
+                                var name = self.question_id_obj_arr()[i].related_catalog()[0].section_name()
+                                $(this).tagsinput('add',{id:id,text:name});
+                            });
+                    });
+                }
+            });        
+       
+        });
+    
+        if(self.data.test){
+            edit_config = self;
+        }
+    };
+});
