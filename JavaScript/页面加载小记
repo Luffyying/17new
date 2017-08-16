@@ -1,0 +1,24 @@
+jQuery提供了三种方法来提供页面载入事件：
+1.$(document).ready(callback)在DOM就绪时执行回调，返回值为document构成的jQuery集合。
+2.$(function(){})  同上
+3.$(window).load()DOM就绪，并且页面渲染结束（图片等资源已接收完成）时执行回调。
+
+
+DOM API 在页面载入问题上主要提供了三个接口：
+1.DOMContentLoaded事件；
+页面文档（DOM）完全加载并解析完毕之后，会触发DOMContentLoaded事件， HTML文档不会等待样式文件，图片文件，Iframe页面的加载。 此时DOM元素可能还未渲染结束，位置大小等状态可能不正确， 但DOM树已被创建，多数JavaScript已经操作DOM并完成功能了。
+所以绝大多数场景下都应当使用DOMContentLoaded事件， jQuery也采用了这种实现。
+document.addEventListener("DOMContentLoaded", function(event) {
+    console.log("DOM ready!");
+});
+2.load事件；
+页面完全载入时触发load事件，此时所有的图片等资源文件都已完全接收并完成渲染。 
+因此load总是在DOMContentLoaded之后触发。 load事件没有任何兼容性问题。load常常被作为最终的Fallback。
+
+注意IE8及以下不支持addEventListener，需要使用attachEvent来绑定事件处理函数
+document.addEventListener("load", function(event) {
+    console.log("All resources finished loading!");
+});
+3.document.readyState属性，及其对应的readystatechange事件。
+
+
