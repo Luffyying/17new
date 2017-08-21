@@ -1,0 +1,15 @@
+写样式，遇到这样的情况，自己并没有在ul上设置padding,怎么会有一个40px的padding呢，它的样式是这样滴：
+ul, menu, dir {
+    display: block;
+    list-style-type: disc;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 40px;
+}
+来自于 user agent stylesheet
+原来这是浏览器默认的样式，不同的浏览器默认样式各不相同，故这就是我们会在公共样式里面这样写：
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, 
+legend, input, button, textarea, p, blockquote, table, th, td {margin:0; padding:0;}  
+（这次忽略了》。。）
