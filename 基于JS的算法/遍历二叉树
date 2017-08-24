@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>遍历二叉树的js伪代码</title>
+	<link rel="stylesheet" href="">
+</head>
+<body>
+	<script>
+		//顺序存储结构
+		var tree = [1,2,3,4,5];
+		//链式存储
+		
+		function BTree(data,leftChild,rightChild){
+			//data 代表要访问的节点
+			this.data = data || null;
+			this.leftChild = leftChild || null
+			this.rightChild = rightChild || null
+		}
+		//先序遍历 (中序遍历,后序遍历与先序递归遍历类似，略)
+		//遍历二叉树 递归
+		BTree.prototype.preOrderVisit = function preOrderVisit(visit){
+			visit(this.data);
+			if(this.leftChild){
+				preOrderVisit.call(this.leftChild,visit)
+			}
+			if(this.rightChild){
+				preOrderVisit.call(this.rightChild,visit)
+			}
+		}
+		function visit(){
+			// console.log(d);
+		}
+		var a= new BTree(1,2,3)
+		console.log(a);
+		a.preOrderVisit(visit);
+		//非递归 用栈的思想
+		var stack = [];//采用数组做为栈
+		BTree.prototype.visitNode = function visitNode(visit){
+			if(!data) return
+				stack.push(this);
+			    // this.data.push(stack);
+				while(stack.length){
+					var p;
+					//先访问根节点，再遍历左子树，如果有左孩子，则一直遍历,入栈
+					while((p = stack.peek())){
+						visit(this.data);
+						stack.push(this.leftChild)
+					}
+					
+					stack.pop();//回到右孩子的父节点上
+					if(stack.top){
+						p = stack.pop();
+						stack.push(p.rightChild);
+					}
+				}
+				
+		}
+		//中序遍历 非递归 栈
+		var stack2 = [];
+		BTree.prototype.middleVisit = function middleVisit(visit){
+			if(!data) return
+				stack2.push(data);//根节点先入栈
+				while(stack2.length){
+					var p = data.leftChild;
+					while(data.leftChild){
+						stack2.push(data.leftChild);
+						data = data.leftChild;
+					}
+					
+					var k = stack2.pop();
+					if(stack2.top){
+						visit(k);
+						stack2.push(data.rightChild);
+					}
+					
+				}
+		}
+		//后序遍历 非递归 左右根 栈
+		BTree.prototype.afterVisit = function afterVisit(visit){
+			var stack3 = [];
+			if(!data) return;
+			stack3.push([data,0]);
+			while(stack3.length){
+				var  a = stack3.pop();
+				switch (a[1]) {
+                case 0:
+                    stack.push([node, 1]);  // 修改mark域
+                    if (node.leftChild) stack.push([node.leftChild, 0]);  // 访问左子树
+                    break;
+                case 1:
+                    stack.push([node, 2]);
+                    if (node.rightChild) stack.push([node.rightChild, 0]);
+                    break;
+                case 2:
+                    node.data && visit(node.data);
+                    break;
+                default:
+                    break;
+            }
+
+			}
+		}
+	</script>
+</body>
+</html>
