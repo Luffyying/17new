@@ -1,0 +1,30 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>html5预览mp3</title>
+    <script>
+    window.onload=function(){
+        var audio=document.getElementById("audio");
+        document.getElementById("test").onchange=function(e){
+            console.log(e.target.files);
+            var file=e.target.files[0],src=window.createObjectURL&&window.createObjectURL(file)||window.URL&&window.URL.createObjectURL(file)||window.webkitURL && window.webkitURL.createObjectURL(file);
+            if(/^audio/i.test(file.type)){
+                audio.style.display='block';
+                audio.src=src;
+                audio.play();
+                function g(){isNaN(audio.duration) ? requestAnimationFrame(g):console.info("该歌曲的总时间为："+audio.duration+"秒")}
+                requestAnimationFrame(g);
+            }else{
+                audio.pause();
+                audio.style.display='none';
+                alert("请选择音乐文件！");
+            }
+        }
+    }
+    </script>
+</head>
+<body>
+<input id="test" type="file" multiple="multiple"/>
+<audio id="audio" controls="" style="display: none;"></audio>
+</body>
+</html>
