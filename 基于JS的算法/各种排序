@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>各种排序</title>
+	<link rel="stylesheet" href="">
+</head>
+<body>
+	<script>
+	/************************************************************************************/
+		//经典的冒泡排序从大到小
+		//空间复杂度：o(1),时间复杂度：o(n^2) 稳定 最好的情况（o(n)）
+		var testArray = [2,5,9,1,4,3,0,8,6];
+		function bubble(){
+			for(var i=0;i<testArray.length-1;i++){
+				for(var j=0;j<testArray.length-i;j++){
+					if(testArray[j]<testArray[j+1]){
+						var re = testArray[j+1];
+						testArray[j+1] = testArray[j];
+						testArray[j] = re;
+					}
+				}
+			}
+		}
+		bubble();
+		console.log(testArray)
+		//改进思路：如果有一趟没有交换任何元素，证明已经有序
+
+	/************************************************************************************/
+		//直接插入排序
+		//其利用的思想是每次都是插入到已经排好序的数组中 从小到大
+		//空间复杂度：o(1),时间复杂度：o(n^2) 稳定
+		var testArray2 = [2,5,9,1,4,3,0,8,6];
+		//var newArray = [];
+		function insert(){
+			//第一个是自然是有序的
+			for(var i=1;i<testArray2.length;i++){
+				var temp = testArray2[i];//待插入的数
+				var j = i-1;
+				while(j>=0 && testArray2[j]>temp){
+					testArray2[j+1] = testArray2[j];
+					j--;
+				} 
+				if(j!= i-1){
+					testArray2[j+1] = temp;
+				}
+			}
+
+		}
+		insert();
+		console.log(testArray2);
+
+    /************************************************************************************/
+		//选择排序
+		//空间复杂度：o(1),时间复杂度:o(n^2) 不稳定
+		var testArray3 = [2,5,9,1,4,3,0,8,6];
+		function select(){
+			for(var j=0;j<testArray3.length-1;j++){
+				var min= j;//哨兵 默认设置第一个元素为哨兵
+				for(var i=j+1;i<testArray3.length;i++){
+					if(testArray3[i]<testArray3[min]){
+						min = i;
+					}
+					//比较一轮过后，并没有找到比哨兵的值再大（小）
+					if(min !=j){
+						var temp = testArray3[min];
+						testArray3[min] = testArray3[j];
+						testArray3[j] = temp
+					}
+				}
+			}
+			
+		}
+		select();
+		console.log(testArray3);
+    /************************************************************************************/
+		//快速排序 时间复杂度：n*logn 不稳定 空间复杂度：o(1)
+		//分治思想
+		var testArray4 = [72,6,57,88,60,42,83,73,48,95];
+		/*
+			记住这个思路：一般取数组中第一个数作为基数，i=0,j=9,X = a[i] = 72,从后面往前找第一个比X小的，将该坑的值填到a[0],a[j]变成了新坑，然后再从左面找
+			第一个比新坑大的，来填补，分组后以此类推，知道每组只有一个数。
+		*/
+		//BTree.prototype.quickSort = function quickSort(visit){
+			function Quick(arr,first,last){
+				if(first < last){
+					var p = quickSort(arr,first,last);
+					Quick(arr,first,p-1);
+					Quick(arr,p+1,last);
+				}
+			}
+			function quickSort(arr,first,last){
+				var i = first;//0
+				var j = last;//9
+				var x = arr[i];//a[0] 72
+				if(i<j){
+					while(i<j){
+						while(i<j && x<=arr[j]){
+							j--;
+							
+						}
+						//跳出循环，没找到（i==j）它自己填了自己的坑
+						if(i<j){
+							arr[i++] = arr[j];
+						}
+						
+						while(i<j && x>=arr[i]){
+							i++;
+						}
+						if(i<j){
+							arr[j--] = arr[i];
+						}
+						
+					}
+					arr[i] = x;
+					return i;
+				}
+			}
+
+		//}
+		Quick(testArray4,0,9);
+		console.log(testArray4);
+
+	/************************************************************************************/
+	//希尔排序 不稳定 时间复杂度：o(n^2) 空间复杂度：o(1)
+	/*
+		相对于直接排序有较大的改进(又叫缩小增量排序)(分组插入排序),设置增量序列d={n/2,n/4...1},当步长为1的时候，进行最后一次直接插入排序
+		先将整个待排序元素序列分割成若干个子序列，分别进行直接插入排序
+		当最后分组是0的时候，再对整个元素序列进行一个直接插入排序，得到最后结果
+	*/
+	var a = [72,6,57,88,60,42,83,73,48,95];
+	var n = a.length;
+	function shell(){
+		for(var gap = parseInt(n / 2);gap > 0;gap= parseInt(gap/2)){
+			// debugger;
+			console.log(gap)
+			for(var i=0;i<gap;i++){//分组的个数，每个分组都要做排序
+				for(var j=i+gap;j<n;j+=gap){
+					if(a[j] < a[j-gap]){
+						var  temp = a[j];
+						var k =j-gap;
+						while(k >=0 && a[k]>temp){
+							a[k+ gap] = a[k];
+							k-=gap;
+						}
+						if(k!= j-gap){
+							a[k + gap] = temp;  
+						}
+						
+					}
+				}
+			}
+		}
+	}
+	shell();
+	console.log(a);
+	/************************************************************************************/
+	//归并排序 时间复杂度：o(nlogn)空间复杂度:o(n) 稳定
+	var b = [6, 5, 3, 1, 8, 7, 2, 4];
+	function merge(array){
+		function sort(array, first, last) {
+	        first = (first === undefined) ? 0 : first
+	        last = (last === undefined) ? array.length - 1 : last
+	        if (last - first < 1) {
+	            return;
+	        }
+	        //首先将数组分成若干个数列
+	        var middle = Math.floor((first + last) / 2);
+	        debugger;
+	        sort(array, first, middle);//函数自身调用自身
+	        // console.log();
+	        sort(array, middle + 1, last);
+
+	        var f = first,m = middle,i,temp;
+	        while (f <= m && m + 1 <= last) {
+	            if (array[f] >= array[m + 1]) { // 这里使用了插入排序的思想
+	                temp = array[m + 1];
+	                for (i = m; i >= f; i--) {
+	                    array[i + 1] = array[i];
+	                }
+	                array[f] = temp;
+	                m++
+	            } else {
+	                f++
+	            }
+	        }
+	        return array;
+	    }
+    	return sort(array);
+	}
+	console.log(merge(b));
+
+	</script>
+</body>
+</html>
