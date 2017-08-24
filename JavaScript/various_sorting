@@ -75,7 +75,7 @@
 		select();
 		console.log(testArray3);
     /************************************************************************************/
-		//快速排序 时间复杂度：n*logn 不稳定
+		//快速排序 时间复杂度：n*logn 不稳定 空间复杂度：o(1)
 		//分治思想
 		var testArray4 = [72,6,57,88,60,42,83,73,48,95];
 		/*
@@ -123,7 +123,7 @@
 		console.log(testArray4);
 
 	/************************************************************************************/
-	//希尔排序 不稳定 时间复杂度：
+	//希尔排序 不稳定 时间复杂度：o(n^2) 空间复杂度：o(1)
 	/*
 		相对于直接排序有较大的改进(又叫缩小增量排序)(分组插入排序),设置增量序列d={n/2,n/4...1},当步长为1的时候，进行最后一次直接插入排序
 		先将整个待排序元素序列分割成若干个子序列，分别进行直接插入排序
@@ -133,7 +133,7 @@
 	var n = a.length;
 	function shell(){
 		for(var gap = parseInt(n / 2);gap > 0;gap= parseInt(gap/2)){
-			debugger;
+			// debugger;
 			console.log(gap)
 			for(var i=0;i<gap;i++){//分组的个数，每个分组都要做排序
 				for(var j=i+gap;j<n;j+=gap){
@@ -154,7 +154,42 @@
 		}
 	}
 	shell();
-	console.log(a)
+	console.log(a);
+	/************************************************************************************/
+	//归并排序 时间复杂度：o(nlogn)空间复杂度:o(n) 稳定
+	var b = [6, 5, 3, 1, 8, 7, 2, 4];
+	function merge(array){
+		function sort(array, first, last) {
+	        first = (first === undefined) ? 0 : first
+	        last = (last === undefined) ? array.length - 1 : last
+	        if (last - first < 1) {
+	            return;
+	        }
+	        //首先将数组分成若干个数列
+	        var middle = Math.floor((first + last) / 2);
+	        debugger;
+	        sort(array, first, middle);//函数自身调用自身
+	        // console.log();
+	        sort(array, middle + 1, last);
+
+	        var f = first,m = middle,i,temp;
+	        while (f <= m && m + 1 <= last) {
+	            if (array[f] >= array[m + 1]) { // 这里使用了插入排序的思想
+	                temp = array[m + 1];
+	                for (i = m; i >= f; i--) {
+	                    array[i + 1] = array[i];
+	                }
+	                array[f] = temp;
+	                m++
+	            } else {
+	                f++
+	            }
+	        }
+	        return array;
+	    }
+    	return sort(array);
+	}
+	console.log(merge(b));
 
 	</script>
 </body>
