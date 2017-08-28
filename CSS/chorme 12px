@@ -1,0 +1,15 @@
+如何兼容处理谷歌浏览器下最小字体不能设置12px以下的方法（摘抄版）：
+     .small-font{    
+
+　　　  font-size:12px; 
+            -webkit-transform-origin-x: 0;
+            -webkit-transform: scale(0.90);//css缩放
+        }
+
+
+        .smallsize-font {
+ 　　　　   font-size:10.8px;
+
+       }
+
+　　<p style="color: #FF0000;" class="small-font smallsize-font">温馨提示：</p>
