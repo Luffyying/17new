@@ -1,0 +1,57 @@
+<html5>
+    <body>
+        <script>
+            function isObject(a){
+                return a !==null && typeof obj==='object'
+            }
+            //判断两个操作对象是否相等，返回布尔值
+            function looseEqual(a,b){
+                if(a ===b){
+                    return true
+                }
+                var isObjectA = isObject(a);
+                var isObjectB = isObject(b);
+                if(isObjectA && isObjectB){
+                     //如果比较对象都是对象属性,包括数组，{}等
+                    try{
+                        var isArrayA =Array.isArray(a);
+                        var isArrayB =Array.isArray(b);
+                        var isObjectB = isObject(b);
+                        if(isArrayA && isArrayB){
+                            //如果二者是普通的数组
+                             return a.length ===b.length && a.every(function(e,i){ return looseEqual(e,b[i])}) 
+                             //函数中的e相当于元素成员
+                        }else if(!isArrayA && !isArrayB){
+                            var keysA = Object.keys(a);//获得所有键名
+                            var keysB = Object.keys(b);
+                            return keysA.length ===keysB.length && keysA.every(function(key){
+                                return looseEqual(a[key],b[key]);
+                            })
+                        }else{
+                            return false;
+                        }
+
+                       
+                    }catch(e){
+                        return false;
+                    }
+                    
+
+                }else if(!isObjectA && !isObjectB){
+                    //如果比较对象都不是对象属性
+                    return String(a) ===String(b)
+                }else{
+                    return false;
+                }
+            }
+            console.log(looseEqual([2,3],[4,5]));
+            console.log(looseEqual([2,3],[2,3]));
+        </script>
+        
+    </body>
+</html5>
+<script>
+    //模拟链表
+
+</script>
+
