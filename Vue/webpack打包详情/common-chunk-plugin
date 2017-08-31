@@ -1,0 +1,11 @@
+webpack.optimize.CommonsChunkPlugin插件的使用
+	方式一，传入字符串参数
+	new webpack.optimize.CommonsChunkPlugin('common.js'); // 默认会把所有入口节点的公共代码提取出来,生成一个common.js
+	方式二，有选择的提取公共代码（只提取main节点和index节点）
+	new webpack.optimize.CommonsChunkPlugin('common.js',['main','index']),
+	方式三，有选择性的提取（对象方式传参） (推荐)
+	new webpack.optimize.CommonsChunkPlugin({
+            name:'common', // 注意不要.js后缀
+            chunks:['main','user','index']
+        }),
+	CommonsChunkPlugin将打包在一起的拆分出来（用<script>标签单独加载）
