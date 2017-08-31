@@ -1,0 +1,52 @@
+因为每个模块（SPA）都会通过前端路由切换页面，故采用vue-router即可，但是打包的时候，并不会把每个.vue组件都会独立打包在每个单独的模块中，我们采用的策略是：
+公共组件打包在一起，继上次继续修改webpack.config.js文件。
+1.找到这些组件：
+var comps = glob.sync('./src/apps/*/*.vue');
+var compsEntry = {components:comps};
+config.entry = Object.assign({},config.entry,compsEntry);
+2.在每个模块中引入这个打包过后的组件库
+var plug = new htmlWebpackPlugin({
+    filename:  md_name+'/index.html', // html 文件输出路径
+    chunks: [name,'components'],//应用的模块,选择哪些模块注入
+    template: path.resolve(__dirname, './src/apps/'+md_name+'/index.html'),//应用的模板
+    inject: true
+ })
+ 3.便于动态加载，随加随用，使用插件将组件剥离
+ new webpack.optimize.CommonsChunkPlugin({
+      names: ['components']
+ })
+ 4.可以在相应模块下，写你的组件
+ 5.last but not least,hahaha在每个模块的入口js中便可以使用了：
+import User from './index.vue'//用户中心
+import home1 from './home.vue'
+import home2 from './home.vue'
+// console.log('模块已经加载进来....');
+// console.log(home1);
+const router1 = new VueRouter({
+		mode: 'history',
+		base:__dirname,
+		routes: [
+		{
+			path: '/home1',
+			name: 'home1',
+			component: home1
+		},
+		{
+			path: '/home2',
+			name: 'home2',
+			component: home2
+		}
+
+		]
+})
+
+new Vue({
+  el: '#app',
+  router:router1,
+  //render:h => h(App)
+   template: '<User/>',
+  components: { User }
+
+})
+（目前路由的展示有些问题，直接在根目录下了，后期改下）
+
