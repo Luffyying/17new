@@ -1,0 +1,53 @@
+接下来的更多插件的应用都是针对多入口来说的。
+webpack关于样式的处理：
+1.
+	css-loader:用于解析
+	style-loader:将解析后的样式嵌入js代码
+	{
+		module:{
+			loaders:[
+				{
+					test:/\.$/,loader:"style-loader!css-loader!less-loader"
+				}
+			]
+		}
+    //从右向左加载的编译顺序
+		//故这些loader加载顺序参考如上，用之取之
+	}
+  
+  
+2.将样式抽取出来为独立的文件：
+ 
+webpack在处理css样式的时候，可以通过link标签写在页面index.vue中，<link rel="stylesheet" href="/src/css/comm.css">
+但由于webpack也可以打包样式，为了整体打包效果，我们将css也作为模块，在入口文件中可以这样写到：
+require('./../../css/comm.css');
+import './../../css/comm.css'
+这样css样式就打包到js中了(webpack可能除了js不认识其他的，比如css，图片等，所以采用这些loader来处理，可以理解为‘this’->'js')
+但是这样会将js文件变得很臃肿，因地制宜，我们可以利用另一个插件ExtractTextPlugin，将每个入口中css剥离出来，形成link形式插入到页面中
+  
+3.应用
+webpack.config.js:
+ new ExtractTextPlugin('css/[name].[id].[contenthash:3].css')
+    /*
+      这里的name是入口文件的名字,
+      id和entry中的chunk的id一致
+      hash就是内容的hash值(contenthash可以换成hash)
+
+    */
+ rules: [
+  {
+    test:/\.css$/,
+    loader: ExtractTextPlugin.extract({
+          loader:'css-loader'
+      })
+     // loader: ExtractTextPlugin.extract({
+     //            fallback: "style-loader",
+     //            use: [{
+     //                loader: 'css-loader',
+     //                options: { importLoaders: 1 }
+     //            },
+     //            {
+     //                loader: 'css-loader',
+     //            }]
+     //        })
+  },
