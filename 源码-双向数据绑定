@@ -1,0 +1,237 @@
+<html5>
+    <head>
+        <!--<script src="vue.js"></script>-->
+        <script src="https://unpkg.com/vue"></script>
+    </head>
+    <body>
+         <div id="app">
+            <input type="text" v-model="text">
+            <span>{{text}}</span>
+         </div>
+        <script>
+           var vm = new Vue({
+               el:'#app',
+               data:{
+                   text:'hello world!'
+               }
+           });
+           /*
+            MVVM框架的两大优势：数据双向绑定和组件化，双向数据绑定的意思就是：页面的数据的改变直接影响data的改变，
+            反之，操作的data的改变则会动态影响到页面上
+            三部分解：
+            1. model->view 初始化绑定
+            2 .view->model 
+            3 .model->view
+
+           */
+           /*
+                补充createDocumentFragment() 创建文档片段,文档片段存在于内存中，并不在DOM树中，所以将子元素插入到
+                文档片段时不会引起页面回流，因此有性能优化的作用
+                与createElement的区别：
+                createElement创建的元素可以使用innerHTML,两者的节点类型完全不同，并且
+                createDocumentFragment创建的元素在文档中没有对应的标记，只能用js访问到,它像一个在dom元素中看不见的父元素
+                把这个父元素追加到页面，可以看到其中的子元素。
+                而且删除后不能再重复添加
+           */
+           1.
+           function node2Fragment(node,vm){
+                //这里是dom劫持，vue会新建一个文档片段来替换dom中本来的结点
+                var flag= document.createDocumentFragment()
+                var child;
+                while(child == node.firstChild){
+                    compile(child,vm);
+                    flag.appendChild(child);
+                }
+                return flag;
+            }
+            function compile(node,vm){
+                var reg = /\{\{(.*)\}\}/;//匹配插值
+                //节点类型为元素
+                if(node.nodeType ===1){
+                    var attr = node.attributes;
+                    for(var i=0;i<attr.length;i++){
+                        //匹配v-model这个属性名称
+                        if(attr[i].nodeName=='v-model'){
+                            var name = attr[i].nodeValue;
+                            node.value = vm.data[name]
+                        }
+                    }
+                }
+                //节点类型为text
+                if(node.nodeType ===3){
+                    if(reg.test(node.nodeValue,$1)){
+                        var name = RegExp.$1;
+                        name = name.trim();
+                        //将data的值赋给该node
+                        node.nodeValue = vm.data[name];
+                    }
+                }
+            }
+
+            //Vue对象
+            function Vue(options){
+                this.data = options.data;
+                var id = options.el;
+                var dom = node2Fragment(document.getElementById(id),this);//这是一个重构的dom,将原来的全部替换一遍
+                //编译完成后，将dom片段添加到el挂载的元素上
+                document.getElementById(id).appendChild(dom);
+            };
+            //调用Vue对象
+            var vm = new Vue({
+                el:'app',
+                data:{
+                    text:'hello world'
+                }
+            });
+
+            2.
+            /*
+                在编译的时候监听node,并且改变data中的值 node.value
+                通知data中的数据改变（这里会用到访问器属性，即Object.defineProperty）
+            */
+
+            //这里我们先完成第二个点，通知数据改变，在全局中新添加两个函数
+            function defineReactive(obj,key,val){
+                Object.defineProperty(obj,key,{
+                    get:function(){
+                        return val
+                    },
+                    set:function(newVal){
+                        if(newVal===val)return;
+                        val = newVal;
+                        console.log('设置新的属性为:'+val);
+                    }
+                })
+            }
+            function observe(obj,vm){
+                Object.keys(obj).forEach(function(key){
+                    defineReactive(vm,key,obj[key]);
+                });
+            }
+            //Vue对象
+            function Vue(options){
+                this.data = options.data;
+                var id = options.el;
+                var data = this.data;
+                //监听，页面数据变化
+                observe(data,this);//将data中的所有数据赋值给vm对象，这样通过读写vm实例的属性转换为读写vm.data的属性值
+                var dom=node2Fragment(document.getElementById(id),this);
+                //编译完成后，将dom片段添加到el挂载的元素上(app)
+                document.getElementById(id).appendChild(dom)
+            }
+            //监听node (修改complie)
+            function compile(node,vm){
+                var reg=/\{\{(.*)\}\}/;
+                //节点类型为元素 
+                if(node.nodeType===1){
+                    var attr=node.attributes;
+                    for(var i=0;i<attr.length;i++){
+                        //匹配v-model这个属性名称
+                        if(attr[i].nodeName=='v-model'){
+                            var name=attr[i].nodeValue;
+                            node.addEventListener('input',function(e){
+                                //给对应的data属性赋值，并触发该属性的set函数
+                                vm[name]=e.target.value;
+                            });
+                            //将data值赋给该node,注意这里本来是vm.data[name]
+                            node.value=vm[name]
+                        }
+                    }
+                };
+                //节点类型为text
+                if(node.nodeType===3){
+                    if(reg.test(node.nodeValue)){
+                        var name=RegExp.$1;
+                        name=name.trim();
+                        //将data的值赋给该node,注意这里本来是vm.data[name]
+                        node.nodeValue=vm[name];
+                    }
+                }
+            }
+
+            3.
+            // 当用户改变data值的时候，去改变view层，涉及到一个设计模式(观察者模式)
+            //让多个观察者同时监听某一个主题对象，这个对象的状态发生改变时就会通知所有观察者对象
+        
+            function compile(node,vm){
+                var reg=/\{\{(.*)\}\}/;
+                //   \.\匹配换行符之外的任何单个字符 \*\ 0次或者多次
+                //节点类型为元素(这块在这里并没有修改)
+                //节点类型为text
+                if(node.nodeType===3){
+                    if(reg.test(node.nodeValue)){
+                        var name=RegExp.$1;
+                        name=name.trim();
+                        //初始化数据，并给对应的data属性值添加观察者
+                        new Watcher(vm,node,name); 
+                    }
+                    //新建了一个Watcher对象，作用是初始化数据(step1),以及触发get函数
+                    //添加这个node到观察者
+
+                }
+            }
+
+            function Watcher(vm,node,name){
+                Dep.target = this;
+                this.name = name;
+                this.node = node;
+                this.vm = vm;
+                //订阅者执行一个更新视图
+                this.update();
+                Dep.target = null;
+            }
+            Watcher.prototype = {
+                update:function(){
+                    this.get();
+                    this.node.nodeValue = this.value;
+                },
+                get:function(){
+                    this.value = this.vm[this.name];
+                }
+            }
+
+
+
+            //主题的结构：
+            function Dep(){
+                //主题的订阅者们
+                this.subs = [];
+            }
+            Dep.prototype = {
+                //添加订阅者
+                addSub:function(sub){
+                    this.subs.push(sub);
+                },
+                //发布 使view更新
+                notify:function(){
+                    this.subs.forEach(function(sub){
+                        sub.updata();
+                    });
+                }
+            }
+
+             function defineReactive(obj,key,val){
+                 //定义一个主题
+                 var dep = new Dep();
+                Object.defineProperty(obj,key,{
+                    get:function(){
+                        //添加订阅者watcher到主题对象Dep
+                        if(Dep.target){
+                            dep.addSub(Dep.target);
+                        }
+                        return val
+                    },
+                    set:function(newVal){
+                        if(newVal===val)return;
+                        val = newVal;
+                        //作为发布者发出通知（更新所有订阅了这个属性的view）
+                        dep.notify();
+                        console.log('设置新的属性为:'+val);
+                    }
+                })
+            }
+        </script>
+
+
+    </body>
+</html5>
