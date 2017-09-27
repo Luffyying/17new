@@ -1,0 +1,54 @@
+可能之前理解的promise还仅仅停留在眼熟它，朋友甩来这篇文章，自己记录一下，就当是理解了，原文章地址：
+http://mp.weixin.qq.com/s?__biz=MzIyMzAwNzExNg==&mid=209354478&idx=1&sn=edd70e826b6f9e8a570024f431c5f7fe&scene=1&key=c76941211a49ab58efed75a0405e3ca61338952103fe9eabf8528d801906e4522737274eecca5489d635a5c1aa5d8b12&ascene=0&uin=MTYxMDY3MjU1&devicetype=iMac+MacBookPro11%2C3+OSX+OSX+10.10.4+build(14E46)&version=11020113&pass_ticket=ws1Ar8vSXgH8%2FuRvUaFkiKCA57pR8100%2BhwA5Ifuc00%3D
+如下四个promise的区别：
+
+（默认doSomething及doSomethingElse都是返回Promise（非类似settimeout等））
+
+  （1）
+    doSomething().then(function(){
+			return doSomethingElse();
+		}).then(finalHandler);
+    
+  （2）
+   doSomething().then(doSomethingElse).then(finalHandler);
+  
+  （3）
+    doSomething().then(function(){
+			doSomethingElse();
+		}).then(finalHandler);
+    
+  （4）
+   doSomething().then(doSomethingElse()).then(finalHandler);
+   
+   
+   理解：
+   
+   （1）这个是最正常的情形，也最好理解，三个函数的执行顺序是：
+   doSomething()
+   -------------doSomethingElse(undefined)
+   ---------------------------------------finalHandler(resOfDoSomeElse)
+   函数括号内的值即为参数，第一个参数执行完毕后再执行then,且then的执行也是按照顺序的，doSomethingElse(),本身就没有
+   传递参数，是undefined,如果想要接收上一个函数传过来的结果，可以这样doSomethingElse.apply(null,arguments)
+   
+   (2)这个与（1）相似，原式可以写成这样，
+   doSomething().then(function(){
+    return Promise()
+   }).then(finalHandler)
+    doSomething()
+    ------------doSomethingElse(resOfDoSome)
+    ---------------------------------------finalHandler(resOfDoSomeElse)
+    如果没有在doSomethingElse中包裹一个function,即 doSomethingElse()，参数就自动传过来了
+    
+    (3)前面两个说的都是顺序执行，后面这两个就不同了
+    doSomething()
+    -------------doSomethingElse(undefined)
+    -------------finalHandler(undefined)
+    因为第二个函数没有return 任何东西，故第三个函数接收的参数是undefined
+    
+    (4)
+    doSomething()
+    doSomethingElse(undefined)
+          -------------finalHandler(resOfDoSome)
+    then里面没有函数，则不会等待，直接执行，它的结果也不会直接往下传递。
+    
+  
