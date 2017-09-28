@@ -1,0 +1,112 @@
+接着2收集一下promise使用的注意事项：
+（1）用promise后怎么用forEach
+一开始，你使用的时候可能是这样的：
+
+  var test = new Promise(function(resolve){
+			resolve([1,2,3,4])
+		}).then(function(res){
+      /*forEach使用*/
+			res.forEach(function(item){
+				console.log(item);
+			})
+		}
+			
+		).then(function(res){
+			console.log('result here:'+res);
+		})
+结果分析：实际上的运行结果并不是你所期待的,而是，第二个then得到的结果是undefined,这时候，它并不等待第一个then执行完毕，
+就开始执行，这时候使用Promise.all()
+
+    var k = [1,2,3];
+		var a = new Promise(function(resolve,reject){
+			resolve(6)
+		});
+		a.then(function(res){
+			console.log(res)
+			//异步版的for循环
+			return Promise.all(k.map(function(item){
+				return item-1
+			}))
+		}).then(function(res){
+			console.log(res);
+		})
+    
+Promise.all()会以一个promises数组为输入（栗子中的相当于promise数组）,返回一个新的promise数组,如果其中任何一个promise为reject，
+则整个Promise.all()的调用就会停止，并且返回那个reject这个新的promise,例如：
+
+    var p1= Promise.reject(1),//Promise.reject(new Error('----'));
+		p2 = Promise.resolve(2),
+		p3 = Promise.resolve(3);
+		Promise.all([p1,p2,p3]).then(function(results){
+			console.log(results);
+		}).then(function(res){//这个then不会执行
+			console.log(res);
+		}).catch(function(err){
+			console.log(err);//会捕捉到错误信息，为reject的内容，输出为1
+		})
+    
+    
+（2）不要忘记使用catch()
+（3）在then里面可以做些什么
+ one:return 另一个promise
+ 如果不return 下一个函数将会接收到undefined
+ two:return 一个同步的值（或者undefined）
+ 可以结合return Promise
+  
+  getSomething().then(function(user){
+			if(inCache[user.id]){
+				return inCache[user.id]
+			}
+			return getUserId();
+		}).then(){
+			//get userid
+		}
+    
+ three:一个同步异常
+  
+  getSomething().then(function(user){
+			if(loggedOut()){
+				throw new Error('此处直接跳出');
+			}
+			if(inCache[user.id]){
+				return inCache[user.id]
+			}
+			return getUserId();
+		}).then(){
+			//get userid
+		}
+ 
+ （4）catch() vs then(null,...)并非等价
+  
+  var k2 = new Promise(function(resolve){
+			resolve([1,2,3,4])
+		}).then(function(res){
+			throw new Error('wrong');
+		},function(err){console.log(err)})//报错，捕捉不到错误
+    
+    
+   var k2 = new Promise(function(resolve){
+			resolve([1,2,3,4])
+		}).then(function(res){
+			throw new Error('wrong');
+		}).catch(function(res){
+			console.log('result here:'+res);//可以捕捉到错误
+		})
+    
+  （5）promise穿透
+  
+		Promise.resolve('0').then(Promise.resolve('1')).then(function(res){
+			console.log(res);//0
+		})
+		Promise.resolve('0').then(null).then(function(res){
+			console.log(res);//0
+		})
+    
+  上面提到过，如果then里面不是一个函数，会理解为null
+			
+ 
+ 
+ 
+ 
+ 
+ 
