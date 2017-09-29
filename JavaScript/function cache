@@ -1,0 +1,24 @@
+/**
+		*@param {Function} func 要缓存的函数 
+		*/
+
+		function cache(func){
+			var calls = {};
+			return function(){
+				var key = JSON.stringify(arguments);
+				if(!(key in calls)){
+					calls[key] = func.apply(null,arguments);
+				}
+				return calls[key];
+			}
+		}
+		var complexFunction = function(arg1,arg2){
+			//复杂的计算
+			console.log('here');//仅仅到这里2次
+			return arg1+arg2;
+
+		}
+		var cacheFunction = cache(complexFunction);//将这个复杂的函数封装在一个函数中
+		console.log(cacheFunction('foo','bar'));//复杂函数首次被调用
+		console.log(cacheFunction('foo','bar'));//第二次调用，缓存的结果将被返回
+		console.log(cacheFunction('foo','change'));//参数改变，函数再次被执行
