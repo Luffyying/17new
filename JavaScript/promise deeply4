@@ -1,0 +1,53 @@
+进一步理解Promise，开始着手自己写一个promise,思路借鉴于：
+https://bupt-hjm.github.io/2017/03/23/study-promise/
+
+这是一个最最基本的形式：
+处理完异步请求后，执行后续的一批then处理,
+    var a = new Promise(function(resolve,reject){
+			resolve();
+		}).then().then().then()
+先模拟一下，首先定义一个Promise类，如下：
+
+	function P(fn){
+			var value = null;
+			var events = [];//执行的那些then
+			this.then = function(f){//then是类P下的一个私有函数
+				events.push(f);//每次调用的时候f入栈
+				return this;
+			}
+			function resolve(newValue){
+
+				console.log("events:"+ events);
+				var f = events.shift();//删除events中前面的一个函数
+				
+				console.log("look herer"+f)
+				f(newValue,resolve);//调用该函数
+			}
+			fn(resolve);//定义一个promise后 直接执行的原因，resolve
+
+		}
+    
+使用：
+
+  	function a(){
+			return new P(function(resolve){
+				setTimeout(function(){
+					console.log('get 1');
+					resolve(1)//这句执行的才是P类下的resolve函数
+				},1000);
+			})
+		}
+
+		a().then(function(value,resolve){
+			setTimeout(function(){
+				console.log('get 2')
+				resolve(2);
+			},1000)
+		}).then(function(value,resolve){
+			console.log(value);
+		})
+    
+首先，执行a(),返回一个promise对象，在类P中，因为最后执行了fn(resolve)，故这就是为什么定义一个promise后就立即执行的原因，然后执行传给P的这个匿名函数
+我们用setTimeout来模拟异步操作，而且因为后面执行的then是链式调用，故在setTimeout的回调函数未执行之前，后面的then都会入队列，使用console.log('get 1')
+标识一下异步执行完毕，开始调用resolve(),也就是说，resolve触发事件并将事件从事件队列中移除，（出队 shift）使事件的触发一直持续下去。这样就是模拟promisede 
+一个大概思路。
