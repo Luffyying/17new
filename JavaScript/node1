@@ -1,6 +1,8 @@
 总是会犯二......
 1.$('.select')得到一个DOM对象的数组，然后取其中一个的value值，于是乎，$('.select')[0].val(),提示it's not a function,val()取值是jQuery写法，而$('.select')[0]
 本身是原生的，二者不能混用。
+$('.select').eq(0).html()这样转换为jq对象再使用。
+
 2.得到一组数据：self.data.state,它是一个数组，形式是这样的：[Array[2],Array[2],Array[2]],如果向头部添加一个Array[2],又不想破坏原值，可以用concat()
 它不会改变原来的数组，仅仅返回被连接数组的一个副本，[[1,'ha']].concat(self.data.state);如果要进行 concat() 操作的参数是数组，那么添加的是数组中的元素，
 而不是数组。所以[1,'ha']要包一层。
