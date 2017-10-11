@@ -1,0 +1,13 @@
+深拷贝：另开辟一段内存空间，与拷贝的原对象脱离关系，改变值不影响现对象。
+
+浅拷贝：和深拷贝相对，指向同一个引用
+
+要点：用JSON.parse(JSON.stringify(obj))来进行深拷贝
+
+（1）var a = JSON.stringify(obj)
+
+将js对象转换为字符串对象，已然obj和a已经没啥关系了
+
+ (2) var b = JSON.parse(a)
+
+此时得到的就是深拷贝的结果
