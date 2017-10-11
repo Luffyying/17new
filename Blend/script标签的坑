@@ -1,0 +1,14 @@
+  <script>
+		var a = 5;
+		console.log(a);
+		var a = 'a;
+	</script>
+	<script>
+		var b = 6;
+		console.log(b);
+	</script>
+  
+  
+  这段代码结果是啥嘞...........................
+  6
+  如果在同一块script标签内出错，则都无显示，报错，其余的script标签不受影响。
