@@ -38,20 +38,20 @@ js引擎是单线程的，可以把每一个函数当做是不可分割的代码
 version1.0~
 		
 	function myPromise(fn){
-			var value = null,
-			deferreds = [];
-			this.then = function(onFulfilled){
-				deferreds.push(onFulfilled);
-				return this;
-			}
-			function resolve(value){
-				setTimeout(function(){
-					deferreds.forEach(function(deferred){
-						deferred(value);
-					});
-				},0)
-			}
-			fn(resolve);
+		var value = null,
+		deferreds = [];
+		this.then = function(onFulfilled){
+			deferreds.push(onFulfilled);
+			return this;
+		}
+		function resolve(value){
+			setTimeout(function(){
+				deferreds.forEach(function(deferred){
+					deferred(value);
+				});
+			},0)
+		}
+		fn(resolve);
 		}
 		var a = new myPromise(function(resolve){
 			setTimeout(function(){
@@ -66,36 +66,36 @@ version1.0~
 思考：这样是存在问题的，当resolve()执行完毕，再次调用then()已经失效了，就是这样：
 
 	setTimeout(function(){
-			a.then(function(res){
-				console.log("won't here");
-			})
+		a.then(function(res){
+			console.log("won't here");
+		})
 		},100)
 由此引入promise的三大状态：pending、fulfilled、rejected
 
 version1.1~
 
 	function P(fn){
-			var value = null,
-			deferreds = [];
-			var state = 'pending';
-			this.then = function(onFulfilled){
-				if(state ==='pending'){
-					deferreds.push(onFulfilled);
-					return this;
-				}
-				onFulfilled(value);
+		var value = null,
+		deferreds = [];
+		var state = 'pending';
+		this.then = function(onFulfilled){
+			if(state ==='pending'){
+				deferreds.push(onFulfilled);
 				return this;
 			}
-			function resolve(newValue){
-				value = newValue;
-				state = 'fulfilled';
-				setTimeout(function(){
-					deferreds.forEach(function(deferred){
-						deferred(value);
-					})
-				},100)
-			}
-			fn(resolve);
+			onFulfilled(value);
+			return this;
+		}
+		function resolve(newValue){
+			value = newValue;
+			state = 'fulfilled';
+			setTimeout(function(){
+				deferreds.forEach(function(deferred){
+					deferred(value);
+				})
+			},100)
+		}
+		fn(resolve);
 		}
 		var a = new P(function(resolve){
 			setTimeout(function(){
