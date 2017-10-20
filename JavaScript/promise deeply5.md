@@ -133,7 +133,92 @@ version1.1~
 
 
 version1.2~
-未完....
+改造then,resolve后
 
+	function myPromise(fn){
+			var state = 'pending';
+			var value = null,
+			deferreds = [];
+			this.then = function(onFulfilled){
+				return new myPromise(function(resolve){
+					//立即执行了handle函数
+					handle({
+						onFulfilled:onFulfilled || null,
+						resolve:resolve
+					})
+				})
+			}
+			function handle(deferred){
+				if(state =='pending'){
+					deferreds.push(deferred);
+					return;
+				}
+				var ret = deferred.onFulfilled(value);
+				deferred.resolve(ret);
+			}
+			//promise不能是同步代码，因为如果是同步的则，resolve会先于then执行，故
+			//需要是异步的，可以通过setTimeout来解决
+			function resolve(newValue){
+				console.log(newValue);
+				//判断newValue的类型，如果是由resolve(8)这种类型传递的，则非串行的promise.
+				if(newValue && (typeof newValue ==='object' || typeof newValue ==='function')){
+					var then = newValue.then;
+					console.log(then);
+					if(typeof then ==='function'){
+						//then();
+						then.call(newValue,resolve)
+						return;
+					}
+				}
+				state = 'fulfilled';
+				value = newValue;
+				setTimeout(function(){
+					deferreds.forEach(function(deferred){
+						handle(deferred)
+					});
+				},0);
+				
+			}
+			fn(resolve);
+			count++;
+		}
+
+then中返回了一个promise
+如下分为两种情况讨论：
+
+**（1）如果then的回调函数中是普通的函数，而不是返回promise，调用return生成返回值**
+	
+	getUserId().then(function(res){
+		 	console.log('here'+res);
+		 	return 9;
+		}).then(function(res){
+			console.log(res);
+		})
+
+
+**（2）如果then的回调函数中返回值是promise**
+
+	getUserId().then(getName).then(function(rr){
+			console.log(rr);
+		})
+	function getName(id){
+			return new myPromise(function(resolve){
+				setTimeout(function(){
+					console.log('get name');
+					resolve(0);
+					
+				},0);
+			})
+		}
+
+### 注意这里，遇到了一个闭包的问题,理解的时候要注意###
+
+
+*getUserId()*遇到异步函数后，执行后面的同步*then*,调用类中*this.then()*函数，因为返回了一个*myPromise*,故进入新的promise里面，执行最后的*fn(resolve)*,但是它和旧的*promise*的*handle*是一个执行环境，也就是执行的是旧*promise*里面的*handle*,*deferreds*也是旧的的*promise*下的变量（*getUserId()*生成的*promise*）
 ## Promise 之后的世界 ##
+
+version1.3~
+加上reject和错误处理的promise
+
+
 
