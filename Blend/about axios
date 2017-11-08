@@ -1,0 +1,12 @@
+axios默认仅支持json格式提交，一般后台也不会做对应的支持，除了自己写一个转义的方法，推荐一个小模块qs
+栗子：添加请求拦截器
+  Axios.interceptors.request.use(
+    config =>{
+      if(config.method =="post"){
+        config.data = qs.stringify(config.data)
+      }
+    } ,
+    error =>{
+      return Promise.reject(error.data.error.message);
+    }
+  );
