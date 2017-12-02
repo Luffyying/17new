@@ -23,7 +23,7 @@
 		this:[object Window]
 		epoch
 
-# 上 #
+## 上 ##
 ### bind怎么实现的 初级 ###
 
 		function isFunc(target){
