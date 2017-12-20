@@ -28,3 +28,5 @@
 			}
 		}
 	};
+	
+其实，如果我们定义的state过多，dispatch action还是比较麻烦的
