@@ -1,0 +1,28 @@
+（1）之前做的一些判断都是通过switch来判断的，get了一个更加简单的方法，以过滤器为例：
+
+Vue.filter('id2name', (id)=>{
+		let result = '';
+
+		let map = {
+			'1': 'choice',
+			'2': 'choice',
+			'3': 'choice',
+			'4': 'blank',
+			'5': 'judge',
+			'6': 'subjective',
+			'7': 'lines',
+			'8': 'classif',
+			'9': 'sort',
+			'10': 'choiceBlank',
+			'16': 'subjective',
+			'17': 'readrecite',
+			'18': 'oralSubjective',
+			'19': 'oralWordRead',
+			'20': 'oralRoleRead',
+			'21': 'oralFollowRead'
+		}
+		result = map[id] || '';
+		return result;
+	});
+  （2）如果想要制造一个从0到100，或者更多的数组的时候，千万不要傻傻的手写了，you can get this:
+  Array(10).fill().map(function(val,index){return index<10?`0${index}`:`${index}`})
