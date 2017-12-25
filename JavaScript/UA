@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>
+		user agent
+	</title>
+	<link rel="stylesheet" href="">
+</head>
+<body>
+
+	<script> document.write(navigator.userAgent)</script>
+	<!-- 正则检查浏览器ua标识，可以通过检测，针对不同的浏览器做适配-->
+	<script>
+		var browser = {
+			versions:function(){
+				var u = navigator.userAgent,app = navigator.appVersion;
+				return {
+					trident:u.indexOf('Trident') > -1,//IE内核
+					presto:u.indexOf('Presto') > -1,//opera内核
+					webKit:u.indexOf('AppleWebKit') > -1//webkit内核
+
+				}
+			}(),
+			language:(navigator.browserLanguage || navigator.language).toLowerCase()
+		}
+		console.log(browser.versions);
+		//可以判断是否是IE内核
+	</script>
+</body>
+</html>
