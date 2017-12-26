@@ -1,0 +1,83 @@
+给某个元素的宽高设置为百分数，大致分为两张情况。
+（1）该元素没有设置为绝对定位，则它的宽高是相对于父元素
+（2）该元素设置为绝对定位，宽高相对于已定位的父元素
+（1测试）<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title></title>
+	<link rel="stylesheet" href="">
+	<style>
+		body,html{
+			height: 100%;
+			width:100%;
+		}
+		/*.ks,.pa{
+			height: 50%;
+			width: 50%;
+		}*/
+		.pa{
+			height: 50%;
+			width: 50%;
+		}
+		.re1{
+			height: 30%;
+			width: 30%;
+			border: 1px solid green;
+		}
+	</style>
+</head>
+<body>
+	<div class="ks">
+		<div class="pa">
+			<div class="re1">
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+（2 测试）
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title></title>
+	<link rel="stylesheet" href="">
+	<style>
+		body,html{
+			margin:0px;
+			padding: 0px;
+			height: 100%;
+			width:100%;
+		}
+		.pa{
+			height: 200px;
+			width: 200px;
+		}
+		.ks{
+			position: relative;
+			height: 400px;
+			width: 400px;
+		}
+		.re1{
+			position: relative;
+			height: 30%;
+			width: 30%;
+			/*top: 20%;*/
+			background: #ccc;
+		}
+	</style>
+</head>
+<body>
+	<div class="ks">
+		<div class="pa">
+			<div class="re1">
+				sdfsdf
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+（3）其实top,bottom也是同理，如果该元素设置为relative,则相对于父元素，如果设置为absolute,则相对于最近的已定位的父元素。
