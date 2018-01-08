@@ -37,6 +37,10 @@ http://blog.csdn.net/sinat_17775997/article/details/52484072
 	<span>lalala</span>
 	<slot name="second"></slot>
 
+(4)分发内容的作用域，由其模板决定（父组件）
+
+参考：http://blog.csdn.net/sinat_17775997/article/details/52484072
+
 
 
 	
