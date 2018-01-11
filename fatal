@@ -1,0 +1,7 @@
+可能这是一个致命的错误，，，以后不要再犯。
+<script>
+		for(var i=0;i<4;i++){
+			console.log('he---');
+			i= 2;
+		}
+	</script>
