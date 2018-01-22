@@ -21,4 +21,26 @@ document.addEventListener("load", function(event) {
 });
 3.document.readyState属性，及其对应的readystatechange事件。
 
+4.关于页面加载多个相同的js，js的onload事件的执行问题：
+    
+    <script>
+		function loadScript(url){
+			loadScript.head = loadScript.head || document.getElementsByTagName('head')[0];
+			let head = loadScript.head;
+			let script = document.createElement('script');
+			script.src = url;
+			script.onload = function(){
+				console.log(`${url} has load`);
+			}
+			head.appendChild(script);
+		}
+		loadScript('api.js');
+		loadScript('api.js');
+		loadScript('api.js');
+		loadScript('api.js');
+	</script>
+    
+  onload事件会执行四次。
+    
+
 
