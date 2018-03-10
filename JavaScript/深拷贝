@@ -1,0 +1,53 @@
+1.深浅拷贝针对的是引用类型的变量。(基本类型的变量的拷贝都是深拷贝)
+浅拷贝：对于仅仅是复制了地址，复制之后原来的变量和新的变量指向同一个东西
+深拷贝：在堆中重新分配内存，复制前的对象和复制后的完全隔离。
+
+
+2.深拷贝
+
+方法：
+
+	1）只有当arr只有是非对象形式可以（基本类型）
+	var arr = [1,2,3]
+	var brr = arr.slice(0)
+
+	2) 只有当arr只有是非对象形式可以（基本类型）
+	var arr = [1,2,3]
+	var brr = arr.concat()
+	但是数组可以深拷贝
+
+	3）jq封装了一个extend方法
+	var obj = [1,2,3,[4]]
+	var obj_extend = $.extend(true,{},obj)
+	//var obj_extend = $.extend(true,[],obj)
+
+	4) JSON.parse(JSON.stringify(obj))
+
+3.深拷贝的实现
+
+		log = console.log;
+		let a = [1,2,3,4,[5,6]];
+		let b = deepClone(a);
+		log(b)
+		function deepClone(obj){
+			if(!obj || typeof obj !=='object'){
+				throw new TypeError('illegal arguments');
+			}
+			var newObj = Array.isArray(obj)?[]:{};
+			for(let i in obj){
+				if(obj.hasOwnProperty(i)){
+					if(typeof obj[i] ==='object' && obj[i]){
+						newObj[i] = deepClone(obj[i])
+					}else{
+						newObj[i] = obj[i]
+					}
+				}
+			}
+			return newObj;
+
+		}
+		a[4][0] = 100;
+		log(a);
+		log(b);
+
+
