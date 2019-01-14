@@ -1,0 +1,136 @@
+<script>
+//进程 or 线程
+//原生js实现ajax，就是一次完整的http请求，异步，回调，线程
+/*
+ajax是告诉浏览器给我发送一个HTTP请求，给我新开一个线程,然后告知我一下，我在其他的function中执行后续操作（回调），在线程返回结果之前，可以继续做其他的事（异步）
+
+
+*/
+
+// ajax(url,()=>{
+
+// })
+// function ajax(url,a){
+
+// }
+//ajax 的核心是:XMLHttpRequest,过程:
+//1)实例化XMLHttpRequest对象
+//2)连接服务器
+//3)发送请求
+//4)接收响应数据
+
+//jq的ajax  形式为:$tools.ajax
+//通用的ajax请求  
+// function ajax(params){
+//     return new Promise((resolve,reject)=>{
+
+//         var p = params || {}
+//         var paramObj = {
+//             url:p.url ||'',
+//             type:p.type || 'POST',
+//             dataType:p.dataType || 'json',
+//             data:p.data,
+//             async:p.async !== undefined ?p.async :true,
+//             showLoading:p.showLoading === undefined ? true : p.showLoading, // 是否显示loading图标
+//             success:function(returnData){
+//                 if(returnData){
+//                     if(returnData.success){
+//                         resolve(returnData)
+//                     }else {
+//                         var errormsg = returnData.error || '操作失败，请重试！'
+//                         reject(returnData)
+//                     }
+//                 }
+//             },
+//             error:function(xhr,textStatus){
+//                 if (textStatus != 'abort') {
+//                     if (p.error) {
+//                         p.error()
+//                     } else {
+//                         msgTip('发送请求失败，请重试！')
+//                     }
+//                     reject('发送请求失败，请重试！')
+//                     // }
+//                     this.showLoading && loadingEnd(!!this.showLoadingMask, p.url)
+//                 }
+//             }
+        
+//         }
+//     })
+// }
+//原生的js实现：
+var ajax = {
+    get:function(url,fn){
+        var xhr = new XMLHttpRequest()
+        //xhr用于在后台与服务器交换数据
+        xhr.open('GET',url,true)
+        xhr.onreadystatechange = function(){
+            //xhr.readyState:4 请求已经完成，且响应已经就绪
+            // console.log(xhr.responseText)
+            if(xhr.readyState == 4 && xhr.status ==200){
+                //如果是本地模拟，压根就没有通过服务器，直接本地打开而已，xhr.status ==0
+                //xhr.responseText 获得字符串形式的响应数据
+                fn.call(this,xhr.responseText)
+            }
+        }
+        /*
+        因为xhr.onreadystatechange是每次xhr.readyState变化时都会触发，而不是xhr.readyState=4时才触发
+        */
+        xhr.onload = function(){
+            alert('请求成功了')
+        }
+        //xhr.readyState 存有服务器响应的状态信息
+
+        //用于将请求送往服务器
+        xhr.send()
+
+    },
+    post:function(url,data,fn){
+        var xhr = new XMLHttpRequest()
+        /*
+            详细解释下open(method,url,async)  分别对应请求的类型、地址、是否异步处理请求
+            async :true（异步）或 false（同步）
+            url：文件在服务器上的位置  ?? 可以理解为目录文件的位置吗？ 但是有些是接口。。。
+        
+        */
+        xhr.open()
+    }
+}
+ajax.get('test.html',function(d){
+    alert(d)
+})
+//所以为了防止因为浏览器的缓存，可以在每次请求文件的时候（给url）加上一个唯一的 id用来,故，这也是为什么要加有些项目压缩的文件
+//要加版本号的原因
+
+//但是Chrome浏览器不支持本地ajax原则，不支持file://协议，解决办法：在快捷方式属性后面加上 --allowxxxxxxxx i forget
+
+function sendAjax(){
+    var formData = new FormData()
+    formData.append('username','jude')
+    var xhr = new XMLHttpRequest()
+    xhr.timeout = 3000
+    //设置请求的超时时间
+    xhr.responseType = 'text'
+    //设置响应返回的数据格式
+
+}
+
+//setRequestHeader 允许我们设置一个请求头信息
+//获得response 返回数据有三个属性：
+/*
+xhr.responseText  ->只有当 responseType 为"text"、""时，xhr对象上才有此属性
+xhr.responseXML ->只有当 responseType 为"text"、""、"document"时，xhr对象上才有此属性
+xhr.response ->较为宽松
+*/ 
+
+
+/*
+关于同步异步请求 async
+xhr默认是发送异步请求
+当xhr为同步请求的时候，有如下限制：
+xhr.timeout = 0
+
+
+*/
+
+</script>
