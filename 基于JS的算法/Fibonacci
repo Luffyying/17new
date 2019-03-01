@@ -1,0 +1,43 @@
+<html5>
+    <script>
+        /*递归的解法：
+        优点：代码简洁，
+        缺点：每次函数在调用自己的时候，都要在内存中分配空间来存储参数，像栈里圧入数据
+        和弹出数据都要消耗时间，数量大的时候容易引起'调用栈溢出'，而且过程中计算了大量
+        重复的数据，时间复杂度随着n的增加按照指数级别
+        循环的解法：
+        O(N)
+        
+        */
+        function fibo(n){
+            var result = [0,1]
+            if(n<2){
+                return result[n]
+            }
+            let total = null
+            let small = result[0]
+            let latestsmall = result[1]
+            for(let i=2;i<=n;i++){
+                
+                total = small + latestsmall
+                small = latestsmall
+                latestsmall = total
+            }
+            return total
+        }
+        console.log(fibo(10))
+
+
+        function otherfi(n){
+            if(n==0){
+                return 0
+            }else if(n==1){
+                return 1
+            }else{
+                return otherfi(n-1)+otherfi(n-2)
+            }
+        }
+        console.log(otherfi(10))
+
+    </script>
+</html5>
