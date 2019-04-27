@@ -1,0 +1,63 @@
+        Function.prototype.myCall = function(context){
+            if(typeof this !=='function'){
+                throw new Error('error')
+            }
+            context = context || window
+            context.fn = this//将函数看作是绑定对象的一个属性
+            const args = [...arguments].slice(1)
+            //es5:Array.prototype.slice.call(arguments,1)
+            //arguments是类数组，不是真正的数组，[...arguments]就是真正的数组了
+            //或者使用Array.prototype.slice.call(arguments)
+            //[...arguments].slice(1) 得到参数，除去第一个调用的对象
+            console.log('here')
+            console.log(args)
+            const result = context.fn(...args)
+            delete context.fn
+            return result
+        }
+
+        Function.prototype.myApply = function(context){
+            if(typeof this !=='function'){
+                throw new Error('error')
+            }
+            context = context || window
+            context.fn = this
+            const res = ''
+            const args = arguments[1]
+            if(args){
+                res = context.fn(args)
+            }else {
+                res = context.fn()
+            }
+        }
+
+        Function.prototype.myBind = function(context){
+            const _this = this
+            const args = [...arguments].slice(1)
+            return function F(){
+                const arg = [...arguments]
+                const realargs = arg.concat(args)
+                _this.apply(context,realargs)
+
+            }
+        }
+
+        Function.prototype.bi = Function.prototype.bi || function(context){
+            if(!isFunc(this)) {
+                throw new TypeError('what is trying to be bound need a function ')
+            }
+            var target = this;
+            var argu = Array.prototype.slice.call(arguments,1)
+            var F = function(){}
+            if(this.prototype){
+                F.prototype = this.prototype;
+            }
+            var bound = function(){
+                var argu_default =  Array.prototype.slice.call(arguments)
+                target.apply(this instanceof F?this:context || this,argu.concat(argu_default))
+            }
+            bound.prototype = new F();
+            F.prototype = null;
+            return bound;
+
+        }
