@@ -158,7 +158,7 @@
             //settimeout 返回值是唯一的一个ID
 
             // console.log(res)
-            return new Promise((res,rej)=>{
+            return new Promisee((res,rej)=>{
                 // res(8)
                 setTimeout(()=>{
                     res(8)
