@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // function Promisee(executor){
+        //     let _ = this
+        //     //用数组是因为多次调用then(非链式调用的then)
+        //     _.resolveCallbacks=[]
+        //     _.rejectCallbacks=[]
+        //     _.value = undefined
+        //     _.reason = undefined
+        //     _.state = 'pending'
+        //     function resolve(value){
+        //         _.value = value
+        //         _.state = 'fulfilled'
+        //         _.resolveCallbacks.forEach((fn)=>fn())
+        //     }
+        //     function reject(reason){
+        //         _.reason = reason
+        //         _.state = 'rejected'
+        //         _.rejectCallbacks.forEach((fn)=>fn())
+        //     }
+        //     executor(resolve,reject)
+        // }
+        // Promisee.prototype.then = function(onFulfilled,onRejected){
+        //     let _ = this
+        //     if(_.state=="pending"){
+        //         _.resolveCallbacks.push(()=>{
+        //             onFulfilled(_.value)
+        //         })
+        //         _.rejectCallbacks.push(()=>{
+        //             onRejected(_.reason)
+        //         })
+        //     }
+        //     if(_.state=="fulfilled"){
+        //         onFulfilled(_.value)
+        //     }
+        //     if(_.state=="rejected"){
+        //         onRejected(_.reason)
+        //     }
+        // }
+        
+        // var a = new Promisee((res,rej)=>{
+        //     // res(9)
+        //     setTimeout(()=>{
+        //         res(9)
+        //     },1000)
+        // })
+        // //.then是异步的，所以直接加载a的后面,,new promise().then()的返回值是一个异步的，导致下面的a.then()中a is undefined
+        // a.then((res)=>{
+        //     console.log(res)
+        // })
+
+        // a.then((item)=>{
+        //     console.log('我是另外一个callback 函数')
+        //     console.log(item)
+        // })
+
+
+        //上面的代码是没有实现链式调用的
+
+
+        //下面考虑链式调用的情况，then是实例上的方法，所以then返回的是一个新的promise
+
+
+        function Promisee(executor){
+            let _ = this
+            //用数组是因为多次调用then(非链式调用的then)
+            _.resolveCallbacks=[]
+            _.rejectCallbacks=[]
+            _.value = undefined
+            _.reason = undefined
+            _.state = 'pending'
+            function resolve(value){
+                _.value = value
+                _.state = 'fulfilled'
+                _.resolveCallbacks.forEach((fn)=>fn())
+            }
+            function reject(reason){
+                _.reason = reason
+                _.state = 'rejected'
+                _.rejectCallbacks.forEach((fn)=>fn())
+            }
+            executor(resolve,reject)
+        }
+        function resolvePromise(promise,x,resolve,reject){
+            //如果x可能是一个promise
+            if(x!==null&&(typeof x==="object"||typeof x==="function")){ 
+                let then=x.then;
+                //如果x是一个promise，因为promise都要有then函数的
+                if(typeof then === "function"){
+                    //y表示x这个promise的值
+                    then.call(x,y=>{
+                        //继续遍历，直至返回值不是promise
+                        resolvePromise(promise,y,resolve,reject)
+                    },err=>{
+                        reject(err)
+                    })
+                }else{
+                    //如果x是个普通对象，直接运行
+                    resolve(x)
+                }
+            }else{
+                //如果x不是一个promise，也就是x是一个常量，直接运行
+                resolve(x)
+            }
+        }
+
+        Promisee.prototype.then = function(onFulfilled,onRejected){
+            let _ = this
+            let promise2
+            function resolveFunction(promise,resolve,reject){
+                let x = onFulfilled(_.value)
+                //保证了顺序
+                resolvePromise(promise,x,resolve,reject)
+            }
+            function rejectFunction(promise,resolv,reject){
+                let x = onRejected(_.reason)
+                resolvePromise(promise,x,resolve,reject)
+            }
+            promise2 = new Promisee((resolve,reject)=>{
+                if(_.state=="pending"){
+                    _.resolveCallbacks.push(()=>{
+                        resolveFunction(promise2,resolve,reject)
+                    })
+                    _.rejectCallbacks.push(()=>{
+                        rejectFunction(promise2,resolve,reject)
+                    })
+                }
+                if(_.state=="fulfilled"){
+                    resolveFunction(promise2,resolve,reject)
+                }
+                if(_.state=="rejected"){
+                    rejectFunction(promise2,resolve,reject)
+                }
+            })
+            
+            return promise2
+        }
+        
+        var a = new Promisee((res,rej)=>{
+            // res(9)
+            setTimeout(()=>{
+                res(9)
+            },1000)
+        })
+        //.then是异步的，所以直接加载a的后面,,new promise().then()的返回值是一个异步的，导致下面的a.then()中a is undefined
+        a.then((res)=>{
+            // return setTimeout(()=>{
+            //     return 0
+            // })
+            //settimeout 返回值是唯一的一个ID
+
+            // console.log(res)
+            return new Promise((res,rej)=>{
+                // res(8)
+                setTimeout(()=>{
+                    res(8)
+                })
+            }).then((i)=>{
+                console.log(i)
+                return i+2
+            })
+            /*但凡是then中 return new promise(()=>{
+
+            }).then().then()  下一个then的参数的值就是最后的返回结果，，因为会一直拿着then(res)中
+            res()的结果去遍历，直到是返回值不是promise
+            */
+        }).then((item)=>{
+            console.log('我是第二个then函数')
+            console.log(item)
+        })
+    </script>
+</body>
+</html>
